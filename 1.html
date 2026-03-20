@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jatin Health">
+<title>Jatin's Health Tracker</title>
+<style>
+:root {
+  --blue: #1e3a5f; --blue-light: #e8f0f8;
+  --green: #2d7b3f; --green-light: #e8f5e8;
+  --orange: #c45e00; --orange-light: #fff3e8;
+  --purple: #7b2d8b; --purple-light: #f5e8ff;
+  --red: #e24b4a; --red-light: #ffeaea;
+  --amber: #e8a020; --amber-light: #fff8e8;
+  --gray: #666; --gray-light: #f5f5f5;
+  --border: #e0e0e0; --white: #fff;
+  --text: #1a1a1a; --text-muted: #666;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f0f4f8; color: var(--text); min-height: 100vh; padding-bottom: 80px; }
+/* Header */
+.header { background: var(--blue); color: white; padding: 16px 16px 12px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 18px; font-weight: 700; }
+.header-date { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+.phase-pill { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; }
+/* Bottom Nav */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
+.nav-btn { flex: 1; padding: 10px 4px 8px; text-align: center; cursor: pointer; border: none; background: none; color: var(--gray); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: color 0.15s; }
+.nav-btn.active { color: var(--blue); }
+.nav-btn svg { width: 22px; height: 22px; }
+/* Pages */
+.page { display: none; padding: 12px; }
+.page.active { display: block; }
+/* Cards */
+.card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+.card-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.card-title { font-size: 14px; font-weight: 700; color: var(--blue); }
+.card-body { padding: 12px 16px; }
+/* Progress ring */
+.progress-ring-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+.progress-ring-container { position: relative; width: 120px; height: 120px; }
+.progress-ring-container svg { transform: rotate(-90deg); }
+.progress-ring-bg { fill: none; stroke: #e8eef5; stroke-width: 10; }
+.progress-ring-fill { fill: none; stroke: var(--blue); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+.progress-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.progress-ring-pct { font-size: 26px; font-weight: 800; color: var(--blue); }
+.progress-ring-lbl { font-size: 11px; color: var(--text-muted); }
+/* Day type selector */
+.day-type-row { display: flex; gap: 6px; padding: 10px 12px; background: var(--gray-light); }
+.day-type-btn { flex: 1; padding: 8px 4px; border-radius: var(--radius-sm); border: 2px solid transparent; background: white; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; color: var(--gray); }
+.day-type-btn.active-walk { border-color: var(--green); background: var(--green-light); color: var(--green); }
+.day-type-btn.active-gym { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+.day-type-btn.active-office { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+/* Activity items */
+.activity-block { margin-bottom: 4px; }
+.block-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); background: var(--gray-light); padding: 5px 16px; }
+.activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background 0.1s; }
+.activity-item:last-child { border-bottom: none; }
+.activity-item:active { background: #f8f8f8; }
+.activity-item.done { opacity: 0.55; }
+.activity-checkbox { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+.activity-item.done .activity-checkbox { background: var(--green); border-color: var(--green); }
+.checkmark { display: none; color: white; font-size: 13px; font-weight: 700; }
+.activity-item.done .checkmark { display: block; }
+.activity-content { flex: 1; min-width: 0; }
+.activity-time { font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 1px; }
+.activity-name { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.activity-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+.cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+/* Category colors */
+.cat-water { background: #0077b6; }
+.cat-supp { background: #7b2d8b; }
+.cat-food { background: #2d7b3f; }
+.cat-exercise { background: #c45e00; }
+.cat-habit { background: #1e3a5f; }
+.cat-hair { background: #8b0000; }
+.cat-sleep { background: #4a4a8a; }
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+.stat-card { background: white; border-radius: var(--radius-sm); padding: 14px 12px; box-shadow: var(--shadow); text-align: center; }
+.stat-val { font-size: 26px; font-weight: 800; }
+.stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.stat-card.blue .stat-val { color: var(--blue); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.orange .stat-val { color: var(--orange); }
+.stat-card.purple .stat-val { color: var(--purple); }
+/* Progress bars */
+.prog-row { margin-bottom: 14px; }
+.prog-label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+.prog-label { font-weight: 600; }
+.prog-vals { color: var(--text-muted); }
+.prog-bar-bg { height: 8px; background: var(--gray-light); border-radius: 4px; overflow: hidden; }
+.prog-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+/* Metrics tracker */
+.metric-input-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.metric-input-row:last-child { border-bottom: none; }
+.metric-input-label { flex: 1; font-size: 13px; font-weight: 500; }
+.metric-input-sub { font-size: 11px; color: var(--text-muted); }
+.metric-input { width: 90px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; text-align: center; color: var(--blue); }
+.metric-input:focus { outline: none; border-color: var(--blue); }
+/* Add activity */
+.add-form { padding: 12px; }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 5px; display: block; }
+.form-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; }
+.form-input:focus { outline: none; border-color: var(--blue); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: white; }
+.btn { padding: 12px 20px; border-radius: var(--radius-sm); border: none; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.15s; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:active { background: #162d4a; }
+.btn-danger { background: var(--red-light); color: var(--red); margin-top: 6px; }
+/* History / Calendar */
+.history-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 12px; }
+.history-day { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.history-day.empty { background: transparent; }
+.history-day.future { background: #f0f0f0; color: #bbb; }
+.history-day.great { background: var(--green); color: white; }
+.history-day.good { background: #7bc87f; color: white; }
+.history-day.okay { background: var(--amber-light); color: var(--amber); }
+.history-day.missed { background: var(--red-light); color: var(--red); }
+.history-day.today { ring: 2px solid var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+/* Streak banner */
+.streak-banner { background: linear-gradient(135deg, var(--orange), #e8a020); color: white; border-radius: var(--radius); padding: 16px; margin: 12px 12px 0; display: flex; align-items: center; gap: 14px; }
+.streak-icon { font-size: 36px; }
+.streak-text h3 { font-size: 18px; font-weight: 800; }
+.streak-text p { font-size: 12px; opacity: 0.9; }
+/* Water tracker */
+.water-tracker { padding: 12px 16px; }
+.water-glasses { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.water-glass { width: 44px; height: 54px; border-radius: 0 0 8px 8px; border: 2.5px solid #0077b6; cursor: pointer; position: relative; overflow: hidden; background: white; transition: all 0.2s; display: flex; align-items: flex-end; }
+.water-glass.filled { background: #0077b6; }
+.water-glass-label { font-size: 9px; font-weight: 700; text-align: center; width: 100%; padding: 3px 0; color: #0077b6; position: absolute; bottom: 2px; }
+.water-glass.filled .water-glass-label { color: white; }
+.water-total { font-size: 13px; color: var(--text-muted); }
+.water-total span { font-weight: 700; color: #0077b6; }
+/* Supplement checklist mini */
+.supp-mini { padding: 4px 0; }
+.supp-mini-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+.supp-mini-item:last-child { border-bottom: none; }
+.supp-check { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 12px; }
+.supp-mini-item.done .supp-check { background: var(--purple); border-color: var(--purple); color: white; }
+.supp-name { font-size: 13px; font-weight: 500; }
+.supp-time { font-size: 11px; color: var(--text-muted); }
+/* Toast */
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 500; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* Section divider */
+.section-divider { font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 14px 12px 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+/* Motivational quote */
+.motivation-card { background: linear-gradient(135deg, var(--blue), #2d6a9f); color: white; border-radius: var(--radius); padding: 16px; margin: 0 0 12px; }
+.motivation-card p { font-size: 13px; line-height: 1.6; opacity: 0.95; }
+.motivation-card .day-count { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+/* Blood marker tracking */
+.blood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.blood-card { background: white; border-radius: var(--radius-sm); padding: 12px; border-left: 4px solid; }
+.blood-card.critical { border-color: var(--red); }
+.blood-card.high { border-color: var(--amber); }
+.blood-card.normal { border-color: var(--green); }
+.blood-marker { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+.blood-val { font-size: 20px; font-weight: 800; }
+.blood-card.critical .blood-val { color: var(--red); }
+.blood-card.high .blood-val { color: var(--amber); }
+.blood-card.normal .blood-val { color: var(--green); }
+.blood-target { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+/* Fab */
+.fab { position: fixed; bottom: 90px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: var(--blue); color: white; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 4px 16px rgba(30,58,95,0.4); display: flex; align-items: center; justify-content: center; z-index: 150; transition: transform 0.15s; }
+.fab:active { transform: scale(0.93); }
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: none; align-items: flex-end; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--blue); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.modal-close { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-light); border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+/* Custom activity list */
+.custom-activity { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+.custom-activity:last-child { border-bottom: none; }
+.custom-del { background: var(--red-light); color: var(--red); border: none; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+/* Gym section */
+.gym-exercise { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.gym-exercise:last-child { border-bottom: none; }
+.gym-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.gym-detail { font-size: 12px; color: var(--text-muted); }
+.gym-log-row { display: flex; gap: 8px; margin-top: 6px; }
+.gym-log-input { flex: 1; padding: 6px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; text-align: center; }
+.gym-log-label { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 2px; }
+/* Summary row */
+.summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted var(--border); font-size: 13px; }
+.summary-row:last-child { border-bottom: none; }
+.summary-key { color: var(--text-muted); }
+.summary-val { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🌿 Jatin's Health Tracker</h1>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+    <div class="phase-pill" id="phasePill">Phase 1</div>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="page active" id="page-today">
+  <!-- Motivation banner -->
+  <div class="motivation-card" id="motivationCard">
+    <div class="day-count" id="dayCount">Day 1 of 42</div>
+    <p id="motivationText">Starting strong! Drink 500ml water with nimbu and head out for your morning walk. 💪</p>
+  </div>
+
+  <!-- Progress ring + water tracker -->
+  <div class="card">
+    <div style="display:flex; align-items:center; padding:8px 16px 0;">
+      <div class="progress-ring-wrap" style="flex:0 0 140px;">
+        <div class="progress-ring-container">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle class="progress-ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="progress-ring-fill" id="progressRing" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="327"/>
+          </svg>
+          <div class="progress-ring-text">
+            <div class="progress-ring-pct" id="progressPct">0%</div>
+            <div class="progress-ring-lbl">done today</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;" id="progressFraction">0 / 0 tasks</div>
+      </div>
+      <div style="flex:1; padding:8px 0 8px 8px;">
+        <div style="font-size:12px;font-weight:700;color:#0077b6;margin-bottom:8px;">💧 Water Intake</div>
+        <div class="water-glasses" id="waterGlasses"></div>
+        <div class="water-total">Today: <span id="waterTotal">0</span> / 3.0 L</div>
+      </div>
+    </div>
+    <!-- Day type -->
+    <div class="day-type-row">
+      <div class="day-type-btn" id="dtWalk" onclick="setDayType('walk')">🚶 Walk Day</div>
+      <div class="day-type-btn" id="dtGym" onclick="setDayType('gym')">🏋️ Gym Day</div>
+      <div class="day-type-btn" id="dtOffice" onclick="setDayType('office')">🏢 Office Day</div>
+    </div>
+  </div>
+
+  <!-- Activities -->
+  <div class="card" id="activitiesCard">
+    <div class="card-header">
+      <span class="card-title">Today's Activities</span>
+      <span style="font-size:12px;color:var(--text-muted);" id="todayDateLabel"></span>
+    </div>
+    <div id="activitiesList"></div>
+  </div>
+</div>
+
+<!-- SUPPLEMENTS PAGE -->
+<div class="page" id="page-supplements">
+  <div class="section-divider">Daily Supplements Tracker</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">💊 Today's Supplements</span>
+      <span style="font-size:11px;color:var(--text-muted);">Tap to mark taken</span>
+    </div>
+    <div class="supp-mini" id="suppList"></div>
+  </div>
+  <div class="section-divider">Supplement Stock</div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📦 Stock Status</span></div>
+    <div class="card-body" id="stockList"></div>
+  </div>
+</div>
+
+<!-- PROGRESS PAGE -->
+<div class="page" id="page-progress">
+  <div class="streak-banner" id="streakBanner">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-text">
+      <h3 id="streakCount">0 Day Streak</h3>
+      <p>Keep going! Consistency builds results.</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card blue"><div class="stat-val" id="totalCompleted">0</div><div class="stat-lbl">Tasks Completed</div></div>
+    <div class="stat-card green"><div class="stat-val" id="daysTracked">0</div><div class="stat-lbl">Days Tracked</div></div>
+    <div class="stat-card orange"><div class="stat-val" id="gymSessions">0</div><div class="stat-lbl">Gym Sessions</div></div>
+    <div class="stat-card purple"><div class="stat-val" id="walkDays">0</div><div class="stat-lbl">Walk Days</div></div>
+  </div>
+
+  <div class="section-divider">42-Day Calendar</div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📅 Completion Calendar</span></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:8px 12px 4px;gap:2px;">
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">M</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">T</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">W</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">T</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">F</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">S</div>
+      <div style="text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);">S</div>
+    </div>
+    <div class="history-grid" id="calendarGrid"></div>
+    <div style="display:flex;gap:12px;padding:8px 12px 12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><div style="width:14px;height:14px;border-radius:3px;background:var(--green);"></div> 80%+</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><div style="width:14px;height:14px;border-radius:3px;background:#7bc87f;"></div> 50–79%</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><div style="width:14px;height:14px;border-radius:3px;background:var(--amber-light);border:1px solid var(--amber);"></div> &lt;50%</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;"><div style="width:14px;height:14px;border-radius:3px;background:#f0f0f0;"></div> Future</div>
+    </div>
+  </div>
+
+  <div class="section-divider">Body Metrics — Log Progress</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📊 Body Measurements</span>
+      <button class="btn btn-primary" style="width:auto;padding:6px 14px;font-size:12px;" onclick="saveMetrics()">Save</button>
+    </div>
+    <div class="card-body">
+      <div class="metric-input-row">
+        <div class="metric-input-label">Weight<div class="metric-input-sub">Start: 77.9 kg</div></div>
+        <input type="number" class="metric-input" id="mWeight" placeholder="kg" step="0.1">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Waist<div class="metric-input-sub">Start: 102 cm · Target: 95</div></div>
+        <input type="number" class="metric-input" id="mWaist" placeholder="cm" step="0.5">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Body Fat %<div class="metric-input-sub">Start: 27.4% · Target: 24%</div></div>
+        <input type="number" class="metric-input" id="mBodyFat" placeholder="%" step="0.1">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Visceral Fat<div class="metric-input-sub">Start: 11.1 · Target: &lt;10</div></div>
+        <input type="number" class="metric-input" id="mVisceral" placeholder="score" step="0.1">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Body Water %<div class="metric-input-sub">Start: 50.2% · Target: 55%</div></div>
+        <input type="number" class="metric-input" id="mWater" placeholder="%" step="0.1">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">Blood Markers — Latest Values</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🩸 Blood Test Results</span>
+      <button class="btn btn-primary" style="width:auto;padding:6px 14px;font-size:12px;" onclick="saveBlood()">Save</button>
+    </div>
+    <div class="card-body" id="bloodInputs">
+      <div class="metric-input-row">
+        <div class="metric-input-label">Homocysteine<div class="metric-input-sub">Start: 88.72 · Target: &lt;40</div></div>
+        <input type="number" class="metric-input" id="bHomo" placeholder="µmol" step="0.01">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Triglycerides<div class="metric-input-sub">Start: 203 · Target: &lt;150</div></div>
+        <input type="number" class="metric-input" id="bTrig" placeholder="mg/dL">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">HDL<div class="metric-input-sub">Start: 39 · Target: &gt;45</div></div>
+        <input type="number" class="metric-input" id="bHDL" placeholder="mg/dL">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">HbA1c<div class="metric-input-sub">Start: 5.5% · Target: &lt;5.3%</div></div>
+        <input type="number" class="metric-input" id="bHba" placeholder="%" step="0.1">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Vitamin D<div class="metric-input-sub">Start: 24.1 · Target: &gt;40</div></div>
+        <input type="number" class="metric-input" id="bVitD" placeholder="ng/ml" step="0.1">
+      </div>
+      <div class="metric-input-row">
+        <div class="metric-input-label">Uric Acid<div class="metric-input-sub">Start: 7.8 · Target: &lt;6.5</div></div>
+        <input type="number" class="metric-input" id="bUric" placeholder="mg/dL" step="0.1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest metrics summary -->
+  <div class="section-divider">Latest Logged Progress</div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📈 Progress vs Baseline</span></div>
+    <div class="card-body" id="progressSummary"></div>
+  </div>
+</div>
+
+<!-- ADD / SETTINGS PAGE -->
+<div class="page" id="page-add">
+  <div class="section-divider">Add Custom Activity</div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">➕ Add to Daily Routine</span></div>
+    <div class="add-form">
+      <div class="form-group">
+        <label class="form-label">Activity Name</label>
+        <input type="text" class="form-input" id="newActivityName" placeholder="e.g. Take ashwagandha">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Time</label>
+          <input type="time" class="form-input" id="newActivityTime" value="09:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="newActivityCat">
+            <option value="supp">💊 Supplement</option>
+            <option value="food">🥗 Food/Meal</option>
+            <option value="exercise">🏃 Exercise</option>
+            <option value="water">💧 Water</option>
+            <option value="habit">✅ Habit</option>
+            <option value="hair">💇 Hair Care</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note (optional)</label>
+        <input type="text" class="form-input" id="newActivityNote" placeholder="Brief description">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Applies to</label>
+        <select class="form-select" id="newActivityDays">
+          <option value="all">Every day</option>
+          <option value="walk">Walk days only</option>
+          <option value="gym">Gym days only</option>
+          <option value="mon-wed-fri">Mon, Wed, Fri only</option>
+          <option value="office">Office days only</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="addCustomActivity()">Add to Routine</button>
+    </div>
+  </div>
+
+  <div class="section-divider">Custom Activities</div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 Your Custom Activities</span></div>
+    <div class="card-body" id="customActivitiesList" style="padding:8px 0;"></div>
+  </div>
+
+  <div class="section-divider">Gym Workout Log</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🏋️ Log Today's Workout</span>
+      <button class="btn btn-primary" style="width:auto;padding:6px 14px;font-size:12px;" onclick="saveGymLog()">Save</button>
+    </div>
+    <div class="card-body" id="gymLogSection"></div>
+  </div>
+
+  <div class="section-divider">Reset</div>
+  <div class="card">
+    <div class="card-body">
+      <button class="btn btn-danger" onclick="resetToday()">🔄 Reset Today's Checklist</button>
+      <button class="btn btn-danger" onclick="confirmClearAll()" style="margin-top:8px;background:#fff0f0;">⚠️ Clear All Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-today" onclick="showPage('today')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Today
+  </button>
+  <button class="nav-btn" id="nav-supplements" onclick="showPage('supplements')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+    Supplements
+  </button>
+  <button class="nav-btn" id="nav-progress" onclick="showPage('progress')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Progress
+  </button>
+  <button class="nav-btn" id="nav-add" onclick="showPage('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Add/Log
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== DATA ====================
+const START_DATE = new Date('2026-03-20');
+const END_DATE = new Date('2026-04-30');
+
+const BASE_ACTIVITIES = {
+  walk: [
+    { id:'w1', time:'08:00', name:'Wake up — drink 500ml warm water with nimbu', cat:'water', note:'Before phone, before chai. Use a large glass.' },
+    { id:'w2', time:'08:10', name:'Morning fasted walk — 30 minutes', cat:'exercise', note:'Outside. Brisk pace. No food before this. Burns visceral fat.' },
+    { id:'w3', time:'09:00', name:'Breakfast — protein-rich (no biscuits)', cat:'food', note:'Curd + moong dal chilla + fruit OR paneer bhurji + roti + curd' },
+    { id:'w4', time:'09:20', name:'Morning supplements', cat:'supp', note:'Tetrafol Plus + D3 5000 IU + Biotin 10000mcg' },
+    { id:'w5', time:'09:30', name:'Start work — set 30-min movement timer', cat:'habit', note:'Phone timer for movement breaks every 30 min' },
+    { id:'w6', time:'10:00', name:'Movement break — 3 min walk inside', cat:'exercise', note:'Walk to kitchen, 10 squats, stretch. Reset timer.' },
+    { id:'w7', time:'10:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w8', time:'11:00', name:'Drink 500ml water', cat:'water', note:'Refill bottle. Keep it on desk.' },
+    { id:'w9', time:'11:00', name:'Movement break — 10 calf raises + walk', cat:'exercise', note:'' },
+    { id:'w10', time:'11:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w11', time:'12:00', name:'Movement break — 10 wall push-ups', cat:'exercise', note:'' },
+    { id:'w12', time:'12:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w13', time:'12:45', name:'Berberine 500mg — 15 min before lunch', cat:'supp', note:'Take BEFORE eating. Times your insulin response.' },
+    { id:'w14', time:'13:00', name:'Lunch — dal + sabzi + 1 roti + curd', cat:'food', note:'300ml water with meal. No rice at lunch either (optional once).' },
+    { id:'w15', time:'13:15', name:'Lunch supplements', cat:'supp', note:'NAC 500mg + Chelated Iron+ + Algae Omega-3 + Calcium' },
+    { id:'w16', time:'13:30', name:'Post-lunch walk — 10 minutes', cat:'exercise', note:'Clears post-meal glucose. Critical habit.' },
+    { id:'w17', time:'14:00', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w18', time:'14:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w19', time:'15:00', name:'Drink 400ml water', cat:'water', note:'' },
+    { id:'w20', time:'15:00', name:'Movement break — 10 squats + walk', cat:'exercise', note:'' },
+    { id:'w21', time:'15:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w22', time:'16:00', name:'Snack — makhana + walnuts + amla water', cat:'food', note:'30g makhana + 5 walnuts + 1 tsp amla in 200ml water. Replace namkeen.' },
+    { id:'w23', time:'16:00', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w24', time:'16:30', name:'Sublingual B12 — dissolve under tongue 90 sec', cat:'supp', note:'Between meals. No chai 30 min before or after.' },
+    { id:'w25', time:'16:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w26', time:'17:00', name:'Drink 400ml water', cat:'water', note:'' },
+    { id:'w27', time:'17:00', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w28', time:'17:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'w29', time:'18:00', name:'Movement break — 15 calf raises + walk', cat:'exercise', note:'' },
+    { id:'w30', time:'18:30', name:'Movement break — last one before dinner', cat:'exercise', note:'' },
+    { id:'w31', time:'18:30', name:'Drink 300ml water before dinner', cat:'water', note:'Helps reduce dinner portion size.' },
+    { id:'w32', time:'18:45', name:'Berberine 500mg — 15 min before dinner', cat:'supp', note:'' },
+    { id:'w33', time:'19:00', name:'Dinner — light (dal + sabzi + 1 small roti)', cat:'food', note:'NO rice at dinner. Double the sabzi. Kitchen closes at 7:30 PM.' },
+    { id:'w34', time:'19:15', name:'Dinner supplements', cat:'supp', note:'Algae Omega-3 (2nd cap) + Vitamin K2 MK7' },
+    { id:'w35', time:'19:30', name:'Post-dinner walk — 10 minutes', cat:'exercise', note:'Critical for glucose clearance and fat loss.' },
+    { id:'w36', time:'20:00', name:'STOP EATING — kitchen closed', cat:'habit', note:'Water, herbal tea, plain chaas only after this.' },
+    { id:'w37', time:'20:00', name:'Last water — 200ml (daily total should be 3L)', cat:'water', note:'Count your intake for the day.' },
+    { id:'w38', time:'22:30', name:'Magnesium Glycinate 400mg — 30 min before sleep', cat:'supp', note:'Your snoring fix. Take every night consistently.' },
+    { id:'w39', time:'22:45', name:'Phone down — screen off', cat:'habit', note:'Blue light blocks melatonin. Enable night mode if needed.' },
+    { id:'w40', time:'23:00', name:'SLEEP — on your side, not your back', cat:'sleep', note:'Place pillow behind back to prevent rolling. Reduces snoring.' },
+  ],
+  gym: [
+    { id:'g1', time:'08:00', name:'Wake up — drink 500ml warm water with nimbu', cat:'water', note:'Before anything else.' },
+    { id:'g2', time:'08:10', name:'Go to society gym — 45 to 50 minutes', cat:'exercise', note:'Check workout tab for today\'s exercises. Progressive overload each week.' },
+    { id:'g3', time:'09:00', name:'Return from gym — shower', cat:'habit', note:'' },
+    { id:'g4', time:'09:15', name:'Breakfast — protein-rich (extra curd/paneer on gym days)', cat:'food', note:'Post-workout meal is important. Add extra curd or paneer today.' },
+    { id:'g5', time:'09:30', name:'Morning supplements', cat:'supp', note:'Tetrafol Plus + D3 5000 IU + Biotin 10000mcg' },
+    { id:'g6', time:'10:00', name:'Movement break — 3 min', cat:'exercise', note:'Even on gym days, breaks during work are important.' },
+    { id:'g7', time:'10:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'g8', time:'11:00', name:'Drink 500ml water', cat:'water', note:'' },
+    { id:'g9', time:'11:00', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'g10', time:'11:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'g11', time:'12:00', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'g12', time:'12:30', name:'Movement break — 3 min', cat:'exercise', note:'' },
+    { id:'g13', time:'12:45', name:'Berberine 500mg — 15 min before lunch', cat:'supp', note:'' },
+    { id:'g14', time:'13:00', name:'Lunch — dal + sabzi + 1 roti + curd', cat:'food', note:'Higher protein today — add paneer if possible.' },
+    { id:'g15', time:'13:15', name:'Lunch supplements', cat:'supp', note:'NAC 500mg + Chelated Iron+ + Algae Omega-3 + Calcium' },
+    { id:'g16', time:'13:30', name:'Post-lunch walk — 10 minutes', cat:'exercise', note:'' },
+    { id:'g17', time:'15:00', name:'Drink 400ml water', cat:'water', note:'' },
+    { id:'g18', time:'16:00', name:'Snack — makhana + walnuts + amla water', cat:'food', note:'' },
+    { id:'g19', time:'16:30', name:'Sublingual B12 — dissolve under tongue 90 sec', cat:'supp', note:'' },
+    { id:'g20', time:'17:00', name:'Drink 400ml water', cat:'water', note:'' },
+    { id:'g21', time:'18:30', name:'Drink 300ml water before dinner', cat:'water', note:'' },
+    { id:'g22', time:'18:45', name:'Berberine 500mg — 15 min before dinner', cat:'supp', note:'' },
+    { id:'g23', time:'19:00', name:'Dinner — light (dal + sabzi + 1 small roti)', cat:'food', note:'NO rice. Kitchen closes 7:30 PM.' },
+    { id:'g24', time:'19:15', name:'Dinner supplements', cat:'supp', note:'Algae Omega-3 (2nd cap) + Vitamin K2 MK7' },
+    { id:'g25', time:'19:30', name:'Post-dinner walk — 10 minutes', cat:'exercise', note:'' },
+    { id:'g26', time:'20:00', name:'STOP EATING — kitchen closed', cat:'habit', note:'' },
+    { id:'g27', time:'20:00', name:'Last water — total 3L for day', cat:'water', note:'' },
+    { id:'g28', time:'22:30', name:'Magnesium Glycinate 400mg', cat:'supp', note:'' },
+    { id:'g29', time:'22:45', name:'Phone down — screen off', cat:'habit', note:'' },
+    { id:'g30', time:'23:00', name:'SLEEP — on your side', cat:'sleep', note:'Place pillow behind back to reduce snoring.' },
+  ]
+};
+
+// Hair activity — Mon, Wed, Fri nights
+const HAIR_ACTIVITY = { id:'hair1', time:'21:00', name:'Hair Treatment — apply to scalp', cat:'hair', note:'Minoxidil 5%: apply 1ml to scalp, leave overnight. OR: Bhringraj/castor oil massage 10 min.' };
+
+const SUPPLEMENTS = [
+  { id:'s1', name:'Tetrafol Plus', dose:'1 tablet', time:'9:20 AM with breakfast', starts:'2026-03-21', daily:true },
+  { id:'s2', name:'Inlife D3 5000 IU', dose:'1 tablet', time:'9:20 AM with breakfast', starts:'2026-03-28', daily:true },
+  { id:'s3', name:'Carbamide Forte Biotin 10000mcg', dose:'1 tablet', time:'9:20 AM with breakfast', starts:'2026-03-23', daily:true },
+  { id:'s4', name:'Berberine 500mg (before lunch)', dose:'1 capsule', time:'12:45 PM before lunch', starts:'2026-03-23', daily:true },
+  { id:'s5', name:'NAC 500mg', dose:'1 capsule', time:'1:15 PM with lunch', starts:'2026-03-20', daily:true },
+  { id:'s6', name:'Chelated Iron+ (Zinc)', dose:'1 tablet', time:'1:15 PM with lunch', starts:'2026-03-20', daily:true },
+  { id:'s7', name:'Algae Omega-3 (lunch)', dose:'1 capsule', time:'1:15 PM with lunch', starts:'2026-03-23', daily:true },
+  { id:'s8', name:'Calcium 500mg', dose:'1 tablet', time:'1:15 PM with lunch', starts:'2026-03-23', daily:true },
+  { id:'s9', name:'Sublingual B12', dose:'1 tablet under tongue', time:'4:30 PM between meals', starts:'2026-03-20', daily:true },
+  { id:'s10', name:'Berberine 500mg (before dinner)', dose:'1 capsule', time:'6:45 PM before dinner', starts:'2026-03-23', daily:true },
+  { id:'s11', name:'Algae Omega-3 (dinner)', dose:'1 capsule', time:'7:15 PM with dinner', starts:'2026-03-23', daily:true },
+  { id:'s12', name:'Vitamin K2 MK7', dose:'1 tablet', time:'7:15 PM with dinner', starts:'2026-03-23', daily:true },
+  { id:'s13', name:'Magnesium Glycinate', dose:'400mg', time:'10:30 PM before sleep', starts:'2026-03-23', daily:true },
+];
+
+const STOCK = [
+  { name:'Tetrafol Plus', qty:60, unit:'tabs', starts:'Mar 21', lasts:'May 20' },
+  { name:'Inlife D3 5000 IU', qty:60, unit:'tabs', starts:'Mar 28', lasts:'May 26' },
+  { name:'Cholecalciferol 60K IU', qty:2, unit:'caps', starts:'Mar 20', lasts:'Mar 27 (done)' },
+  { name:'NAC 500mg', qty:120, unit:'caps', starts:'Mar 20', lasts:'Jul 17' },
+  { name:'Sublingual B12', qty:300, unit:'tabs', starts:'Mar 20', lasts:'Jan 2027' },
+  { name:'Chelated Iron+', qty:100, unit:'tabs', starts:'Mar 20', lasts:'Jun 28' },
+  { name:'RCQ 300', qty:9, unit:'tabs', starts:'Mar 20', lasts:'Mar 28 (done)' },
+  { name:'Algae Omega-3', qty:60, unit:'caps', starts:'Mar 23', lasts:'~Apr 22' },
+  { name:'Berberine 500mg', qty:60, unit:'caps', starts:'Mar 23', lasts:'~Apr 22' },
+  { name:'Magnesium Glycinate', qty:120, unit:'tabs', starts:'Mar 23', lasts:'~Jul 22' },
+  { name:'D3 + K2 MK7', qty:120, unit:'tabs', starts:'Mar 23', lasts:'~Jul 22' },
+  { name:'Biotin 10000mcg', qty:90, unit:'tabs', starts:'Mar 23', lasts:'~Jun 22' },
+];
+
+const WORKOUTS = {
+  // Phase 2 (Apr 3-16): Tue/Thu - Full Body
+  phase2_tue: {
+    name: 'Full Body — Phase 2 (Tuesday)',
+    exercises: [
+      { name:'Treadmill warm-up', sets:'1', reps:'5 min', rest:'—' },
+      { name:'Chest press machine', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Lat pulldown', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Leg press', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Shoulder press machine', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Plank', sets:'2', reps:'20 sec', rest:'60 sec' },
+    ]
+  },
+  phase2_thu: {
+    name: 'Full Body — Phase 2 (Thursday)',
+    exercises: [
+      { name:'Treadmill warm-up', sets:'1', reps:'5 min', rest:'—' },
+      { name:'Seated cable row', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Leg extension machine', sets:'2', reps:'15', rest:'90 sec' },
+      { name:'Dumbbell bicep curl', sets:'2', reps:'12', rest:'90 sec' },
+      { name:'Tricep pushdown', sets:'2', reps:'15', rest:'90 sec' },
+      { name:'Calf raises', sets:'2', reps:'20', rest:'60 sec' },
+    ]
+  },
+  phase3_mon: {
+    name: 'PUSH — Chest, Shoulders, Triceps (Monday)',
+    exercises: [
+      { name:'Treadmill warm-up', sets:'1', reps:'5 min', rest:'—' },
+      { name:'Chest press machine', sets:'3', reps:'12', rest:'90 sec' },
+      { name:'Shoulder press machine', sets:'3', reps:'12', rest:'90 sec' },
+      { name:'Tricep pushdown (cable)', sets:'3', reps:'15', rest:'75 sec' },
+      { name:'Plank', sets:'3', reps:'30 sec', rest:'60 sec' },
+    ]
+  },
+  phase3_wed: {
+    name: 'PULL — Back, Biceps (Wednesday)',
+    exercises: [
+      { name:'Treadmill warm-up', sets:'1', reps:'5 min', rest:'—' },
+      { name:'Lat pulldown', sets:'3', reps:'12', rest:'90 sec' },
+      { name:'Seated cable row', sets:'3', reps:'12', rest:'90 sec' },
+      { name:'Dumbbell bicep curl', sets:'3', reps:'12', rest:'75 sec' },
+      { name:'Leg raises', sets:'3', reps:'12', rest:'60 sec' },
+    ]
+  },
+  phase3_fri: {
+    name: 'LEGS + CORE (Friday)',
+    exercises: [
+      { name:'Treadmill warm-up', sets:'1', reps:'5 min', rest:'—' },
+      { name:'Leg press', sets:'3', reps:'12', rest:'90 sec' },
+      { name:'Leg extension machine', sets:'3', reps:'15', rest:'75 sec' },
+      { name:'Calf raises (standing)', sets:'3', reps:'20', rest:'60 sec' },
+      { name:'Ab crunch machine', sets:'3', reps:'15', rest:'60 sec' },
+      { name:'Plank', sets:'3', reps:'40 sec', rest:'60 sec' },
+    ]
+  }
+};
+
+const MOTIVATION = [
+  "Starting strong! Drink water first, then walk. 💪",
+  "Day 2! Consistency is the only strategy. Keep going.",
+  "Your homocysteine doesn't know you're fighting back — yet. Give Tetrafol time. ⚡",
+  "Fasted walk today burns directly from your visceral fat stores. Science-backed.",
+  "Every post-dinner walk reduces your blood sugar. Simple and powerful.",
+  "Water target: 3 litres. Your uric acid at 7.8 needs it.",
+  "No namkeen today. Makhana instead. Same crunch, 4x the benefit.",
+  "Week 1 done if you've been consistent. The habit is forming. 🔥",
+  "Your body age is 37. Every day of this routine moves it younger.",
+  "Kitchen closes at 7:30 PM. This is your visceral fat rule. Non-negotiable.",
+  "Magnesium tonight reduces snoring. Your family will notice before you do. 😴",
+  "102cm waist. Every consistent week moves that number down.",
+  "Your bones need D3, K2, and Calcium. All three are in today's stack.",
+  "Hair falls when homocysteine is high. Tetrafol is fixing it slowly. Be patient.",
+  "Phase 1 halfway done. Walk every day = most powerful fat-burning habit.",
+  "Water with nimbu first thing. Nimbu helps uric acid. Simple but powerful.",
+  "Post-lunch walk = lower HbA1c. 10 minutes a day moves the number over weeks.",
+  "Berberine before meals = insulin control. Your HOMA-IR will thank you.",
+  "Family history of diabetes. You're interrupting that pattern right now. 💪",
+  "Keep the eating window: 9 AM to 7:30 PM. Everything else can vary.",
+  "Day 21 — three weeks in. Most people quit by now. You haven't.",
+  "Phase 2 begins April 3. Gym twice a week. You're ready.",
+  "Progressive overload: increase weight slightly every week. This is how muscle builds.",
+  "Visceral fat 11.1. Target: below 9. Every week of exercise moves this.",
+  "Your liver, kidneys, and heart are fine. They're waiting for the rest to catch up.",
+  "HDL 39. Omega-3 daily + exercise = this moves up over months. Stay consistent.",
+  "Triglycerides 203. Berberine + no late eating + walks = this will drop.",
+  "Sleep by 11 PM. Your cortisol, insulin, and metabolism reset overnight.",
+  "Side sleeping reduces snoring. Pillow behind your back. Simple.",
+  "4 weeks done. This is now who you are, not just what you're doing. 🌟",
+  "Phase 3 starts April 17. Push/Pull/Legs 3x/week. Body recomposition begins.",
+  "Body fat 27.4%. At this pace: 24% by April 30. You're on track.",
+  "Every morning walk is a vote for the person you want to become.",
+  "Waist measurement: measure weekly. Progress you can see in the mirror.",
+  "No fruit juice. Whole fruit only. Your uric acid and triglycerides need this.",
+  "10 days to checkpoint. Blood tests will show what's working. Stay consistent.",
+  "Your homocysteine should have dropped significantly by now. Tetrafol is working.",
+  "1 week to April 30. Everything you've done these 6 weeks will show in the tests.",
+  "3 more days. Push through the last stretch. The numbers will reflect the effort.",
+  "2 days to checkpoint. Book your blood tests today if not done.",
+  "1 day to checkpoint. Tomorrow: fasting blood draw + body scan. Well done Jatin.",
+  "CHECKPOINT DAY — April 30. Share your results. We'll build Phase 2. 🎯"
+];
+
+// ==================== STATE ====================
+let state = {
+  dayType: 'walk',
+  waterGlasses: 0,
+  completedActivities: {},
+  completedSupps: {},
+  customActivities: [],
+  history: {},
+  metrics: [],
+  bloodResults: [],
+  gymLogs: {}
+};
+
+function getDateKey(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function getTodayKey() {
+  return getDateKey(new Date());
+}
+
+function getDayNumber() {
+  const today = new Date();
+  const diff = Math.floor((today - START_DATE) / 86400000);
+  return Math.max(1, Math.min(42, diff + 1));
+}
+
+function getPhase() {
+  const n = getDayNumber();
+  if (n <= 14) return 1;
+  if (n <= 28) return 2;
+  return 3;
+}
+
+function getWorkoutForToday() {
+  const today = new Date();
+  const dow = today.getDay(); // 0=Sun, 1=Mon...
+  const phase = getPhase();
+  if (phase === 1) return null;
+  if (phase === 2) {
+    if (dow === 2) return WORKOUTS.phase2_tue; // Tue
+    if (dow === 4) return WORKOUTS.phase2_thu; // Thu
+    return null;
+  }
+  if (phase === 3) {
+    if (dow === 1) return WORKOUTS.phase3_mon;
+    if (dow === 3) return WORKOUTS.phase3_wed;
+    if (dow === 5) return WORKOUTS.phase3_fri;
+    return null;
+  }
+  return null;
+}
+
+function isHairNight() {
+  const dow = new Date().getDay();
+  return dow === 1 || dow === 3 || dow === 5; // Mon, Wed, Fri
+}
+
+function isGymDay() {
+  const dow = new Date().getDay();
+  const phase = getPhase();
+  if (phase === 1) return false;
+  if (phase === 2) return dow === 2 || dow === 4;
+  if (phase === 3) return dow === 1 || dow === 3 || dow === 5;
+  return false;
+}
+
+// ==================== STORAGE ====================
+async function loadState() {
+  try {
+    const r = await window.storage.get('jatin-state-v2');
+    if (r && r.value) {
+      const saved = JSON.parse(r.value);
+      state = { ...state, ...saved };
+    }
+  } catch(e) {
+    // Fresh start
+  }
+  // Auto-detect day type
+  if (isGymDay()) state.dayType = 'gym';
+  render();
+}
+
+async function saveState() {
+  try {
+    await window.storage.set('jatin-state-v2', JSON.stringify(state));
+  } catch(e) {}
+}
+
+// ==================== RENDER ====================
+function render() {
+  renderHeader();
+  renderMotivation();
+  renderWaterGlasses();
+  renderDayTypeButtons();
+  renderActivities();
+  renderSupplements();
+  renderStock();
+  renderProgress();
+  renderCalendar();
+  renderCustomActivities();
+  renderGymLog();
+  renderProgressSummary();
+  updateProgressRing();
+}
+
+function renderHeader() {
+  const today = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('headerDate').textContent = `${days[today.getDay()]}, ${today.getDate()} ${months[today.getMonth()]} 2026`;
+  document.getElementById('todayDateLabel').textContent = `Day ${getDayNumber()} of 42`;
+  const phase = getPhase();
+  document.getElementById('phasePill').textContent = `Phase ${phase}`;
+  document.getElementById('phasePill').style.background = phase === 1 ? 'rgba(196,94,0,0.3)' : phase === 2 ? 'rgba(123,45,139,0.3)' : 'rgba(45,123,63,0.3)';
+}
+
+function renderMotivation() {
+  const day = getDayNumber();
+  document.getElementById('dayCount').textContent = `Day ${day} of 42 — March 20 to April 30`;
+  document.getElementById('motivationText').textContent = MOTIVATION[Math.min(day - 1, MOTIVATION.length - 1)];
+}
+
+function renderWaterGlasses() {
+  const container = document.getElementById('waterGlasses');
+  const glasses = state.waterGlasses || 0;
+  let html = '';
+  for (let i = 0; i < 8; i++) {
+    html += `<div class="water-glass ${i < glasses ? 'filled' : ''}" onclick="toggleWater(${i})">
+      <div class="water-glass-label">${(i + 1) * 375}ml</div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  document.getElementById('waterTotal').textContent = ((glasses * 375) / 1000).toFixed(2);
+}
+
+function toggleWater(idx) {
+  state.waterGlasses = idx < state.waterGlasses ? idx : idx + 1;
+  saveState();
+  renderWaterGlasses();
+  showToast(`💧 ${((state.waterGlasses * 375) / 1000).toFixed(1)}L logged`);
+}
+
+function renderDayTypeButtons() {
+  ['walk','gym','office'].forEach(t => {
+    const btn = document.getElementById('dt' + t.charAt(0).toUpperCase() + t.slice(1));
+    btn.className = 'day-type-btn' + (state.dayType === t ? ` active-${t}` : '');
+  });
+}
+
+function setDayType(type) {
+  state.dayType = type;
+  saveState();
+  renderDayTypeButtons();
+  renderActivities();
+  updateProgressRing();
+}
+
+function getActivitiesForToday() {
+  const type = state.dayType === 'gym' ? 'gym' : 'walk';
+  let acts = [...BASE_ACTIVITIES[type]];
+  if (isHairNight()) acts.push(HAIR_ACTIVITY);
+  // Add custom activities
+  const today = new Date();
+  const dow = today.getDay();
+  state.customActivities.forEach(ca => {
+    let include = false;
+    if (ca.days === 'all') include = true;
+    else if (ca.days === 'walk' && state.dayType !== 'gym') include = true;
+    else if (ca.days === 'gym' && state.dayType === 'gym') include = true;
+    else if (ca.days === 'office' && state.dayType === 'office') include = true;
+    else if (ca.days === 'mon-wed-fri' && (dow === 1 || dow === 3 || dow === 5)) include = true;
+    if (include) acts.push(ca);
+  });
+  return acts.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+function renderActivities() {
+  const acts = getActivitiesForToday();
+  const todayKey = getTodayKey();
+  const completed = state.completedActivities[todayKey] || {};
+  let html = '';
+  let lastBlock = '';
+  const blockLabels = {
+    '08': '🌅 Morning Block',
+    '09': '🌅 Morning Block',
+    '10': '💻 Work Block — Movement Breaks',
+    '11': '💻 Work Block — Movement Breaks',
+    '12': '💻 Work Block — Movement Breaks',
+    '13': '🍽 Lunch Block',
+    '14': '💻 Afternoon Work Block',
+    '15': '💻 Afternoon Work Block',
+    '16': '💻 Afternoon Work Block',
+    '17': '💻 Afternoon Work Block',
+    '18': '🌆 Evening Block',
+    '19': '🌆 Evening Block',
+    '20': '🌙 Wind Down',
+    '21': '🌙 Wind Down',
+    '22': '😴 Sleep Block',
+    '23': '😴 Sleep Block',
+  };
+  acts.forEach(act => {
+    const hour = act.time.split(':')[0];
+    const block = blockLabels[hour] || '';
+    if (block !== lastBlock) {
+      html += `<div class="block-label">${block}</div>`;
+      lastBlock = block;
+    }
+    const isDone = !!completed[act.id];
+    html += `<div class="activity-item ${isDone ? 'done' : ''}" onclick="toggleActivity('${act.id}')">
+      <div class="cat-dot cat-${act.cat}"></div>
+      <div class="activity-checkbox"><span class="checkmark">✓</span></div>
+      <div class="activity-content">
+        <div class="activity-time">${act.time}</div>
+        <div class="activity-name">${act.name}</div>
+        ${act.note ? `<div class="activity-note">${act.note}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('activitiesList').innerHTML = html;
+}
+
+function toggleActivity(id) {
+  const todayKey = getTodayKey();
+  if (!state.completedActivities[todayKey]) state.completedActivities[todayKey] = {};
+  if (state.completedActivities[todayKey][id]) {
+    delete state.completedActivities[todayKey][id];
+  } else {
+    state.completedActivities[todayKey][id] = true;
+  }
+  // Update history
+  const acts = getActivitiesForToday();
+  const completed = Object.keys(state.completedActivities[todayKey] || {}).length;
+  state.history[todayKey] = { total: acts.length, completed };
+  saveState();
+  renderActivities();
+  updateProgressRing();
+  if (state.completedActivities[todayKey][id] !== undefined || true) {
+    const act = getActivitiesForToday().find(a => a.id === id);
+    if (act) showToast(state.completedActivities[todayKey][id] ? `✓ ${act.name.slice(0, 30)}` : `Unmarked`);
+  }
+}
+
+function updateProgressRing() {
+  const todayKey = getTodayKey();
+  const acts = getActivitiesForToday();
+  const completed = Object.keys(state.completedActivities[todayKey] || {}).length;
+  const total = acts.length;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const circumference = 327;
+  const offset = circumference - (circumference * pct / 100);
+  document.getElementById('progressRing').style.strokeDashoffset = offset;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFraction').textContent = `${completed} / ${total} tasks`;
+  const color = pct >= 80 ? '#2d7b3f' : pct >= 50 ? '#e8a020' : '#1e3a5f';
+  document.getElementById('progressRing').style.stroke = color;
+  document.getElementById('progressPct').style.color = color;
+}
+
+function renderSupplements() {
+  const today = new Date();
+  const todayKey = getTodayKey();
+  const completedSupps = state.completedSupps[todayKey] || {};
+  let html = '';
+  SUPPLEMENTS.forEach(s => {
+    if (new Date(s.starts) > today) return; // Not started yet
+    const isDone = !!completedSupps[s.id];
+    html += `<div class="supp-mini-item ${isDone ? 'done' : ''}" onclick="toggleSupp('${s.id}')">
+      <div class="supp-check">${isDone ? '✓' : ''}</div>
+      <div>
+        <div class="supp-name">${s.name}</div>
+        <div class="supp-time">${s.dose} · ${s.time}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('suppList').innerHTML = html || '<div style="padding:12px;color:#999;font-size:13px;">No supplements active yet today.</div>';
+}
+
+function toggleSupp(id) {
+  const todayKey = getTodayKey();
+  if (!state.completedSupps[todayKey]) state.completedSupps[todayKey] = {};
+  if (state.completedSupps[todayKey][id]) delete state.completedSupps[todayKey][id];
+  else state.completedSupps[todayKey][id] = true;
+  saveState();
+  renderSupplements();
+  const s = SUPPLEMENTS.find(x => x.id === id);
+  if (s) showToast(state.completedSupps[todayKey][id] ? `💊 ${s.name.slice(0, 25)} taken` : 'Unmarked');
+}
+
+function renderStock() {
+  let html = '';
+  STOCK.forEach(s => {
+    const pct = Math.min(100, (s.qty / 120) * 100);
+    const color = s.qty > 30 ? 'var(--green)' : s.qty > 10 ? 'var(--amber)' : 'var(--red)';
+    html += `<div class="prog-row">
+      <div class="prog-label-row">
+        <span class="prog-label" style="font-size:12px;">${s.name}</span>
+        <span class="prog-vals">${s.qty} ${s.unit} · ${s.lasts}</span>
+      </div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+    </div>`;
+  });
+  document.getElementById('stockList').innerHTML = html;
+}
+
+function renderProgress() {
+  // Streak
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = getDateKey(d);
+    const h = state.history[key];
+    if (h && h.total > 0 && (h.completed / h.total) >= 0.5) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById('streakCount').textContent = `${streak} Day Streak`;
+  // Stats
+  let totalCompleted = 0, daysTracked = 0, gymSessions = 0, walkDays = 0;
+  Object.values(state.history).forEach(h => {
+    if (h.completed > 0) { daysTracked++; totalCompleted += h.completed; }
+  });
+  Object.keys(state.history).forEach(k => {
+    const d = new Date(k);
+    const dow = d.getDay();
+    const phase = Math.floor((d - START_DATE) / 86400000) < 14 ? 1 : Math.floor((d - START_DATE) / 86400000) < 28 ? 2 : 3;
+    if (phase >= 2) {
+      if ((phase === 2 && (dow === 2 || dow === 4)) || (phase === 3 && (dow === 1 || dow === 3 || dow === 5))) {
+        if (state.history[k]?.completed > 0) gymSessions++;
+      } else if (state.history[k]?.completed > 0) walkDays++;
+    } else if (state.history[k]?.completed > 0) walkDays++;
+  });
+  document.getElementById('totalCompleted').textContent = totalCompleted;
+  document.getElementById('daysTracked').textContent = daysTracked;
+  document.getElementById('gymSessions').textContent = gymSessions;
+  document.getElementById('walkDays').textContent = walkDays;
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  // Start calendar from Mar 20 (Thursday = day 4, 0-indexed Mon=0)
+  // Mar 20 = Thursday. Week starts Monday. So offset = 3 empty cells
+  let html = '';
+  for (let i = 0; i < 3; i++) html += '<div class="history-day empty"></div>';
+  for (let day = 1; day <= 42; day++) {
+    const d = new Date(START_DATE);
+    d.setDate(d.getDate() + day - 1);
+    const key = getDateKey(d);
+    const today = new Date();
+    const isFuture = d > today;
+    const isToday = getDateKey(d) === getDateKey(today);
+    const h = state.history[key];
+    let cls = 'history-day';
+    let label = d.getDate();
+    if (isFuture && !isToday) cls += ' future';
+    else if (h && h.total > 0) {
+      const pct = h.completed / h.total;
+      if (pct >= 0.8) cls += ' great';
+      else if (pct >= 0.5) cls += ' good';
+      else cls += ' okay';
+    } else cls += ' okay';
+    if (isToday) cls += ' today';
+    if (day === 42) label = '🎯';
+    html += `<div class="${cls}" title="Day ${day}">${label}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function renderCustomActivities() {
+  const list = document.getElementById('customActivitiesList');
+  if (state.customActivities.length === 0) {
+    list.innerHTML = '<div style="padding:12px;color:#999;font-size:13px;text-align:center;">No custom activities yet. Add one above!</div>';
+    return;
+  }
+  let html = '';
+  state.customActivities.forEach((ca, i) => {
+    html += `<div class="custom-activity">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;">${ca.time} · ${ca.name}</div>
+        <div style="font-size:11px;color:#999;">${ca.note || ''} · ${ca.days}</div>
+      </div>
+      <button class="custom-del" onclick="deleteCustomActivity(${i})">Delete</button>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderGymLog() {
+  const workout = getWorkoutForToday();
+  const section = document.getElementById('gymLogSection');
+  if (!workout) {
+    section.innerHTML = '<div style="color:#999;font-size:13px;text-align:center;padding:12px;">No gym workout scheduled today.<br>Gym days: Phase 2 Tue+Thu · Phase 3 Mon+Wed+Fri</div>';
+    return;
+  }
+  const todayKey = getTodayKey();
+  const log = state.gymLogs[todayKey] || {};
+  let html = `<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:12px;">${workout.name}</div>`;
+  workout.exercises.forEach((ex, i) => {
+    const saved = log[i] || {};
+    html += `<div class="gym-exercise">
+      <div class="gym-name">${ex.name}</div>
+      <div class="gym-detail">${ex.sets} sets × ${ex.reps} · Rest: ${ex.rest}</div>
+      <div class="gym-log-row">
+        <div><input class="gym-log-input" type="number" placeholder="kg" value="${saved.weight || ''}" id="gl_w_${i}" step="2.5"><div class="gym-log-label">Weight (kg)</div></div>
+        <div><input class="gym-log-input" type="number" placeholder="reps" value="${saved.reps || ''}" id="gl_r_${i}"><div class="gym-log-label">Reps done</div></div>
+        <div><input class="gym-log-input" type="number" placeholder="sets" value="${saved.sets || ''}" id="gl_s_${i}"><div class="gym-log-label">Sets done</div></div>
+      </div>
+    </div>`;
+  });
+  section.innerHTML = html;
+}
+
+function saveGymLog() {
+  const workout = getWorkoutForToday();
+  if (!workout) return;
+  const todayKey = getTodayKey();
+  state.gymLogs[todayKey] = {};
+  workout.exercises.forEach((ex, i) => {
+    state.gymLogs[todayKey][i] = {
+      weight: document.getElementById(`gl_w_${i}`)?.value || '',
+      reps: document.getElementById(`gl_r_${i}`)?.value || '',
+      sets: document.getElementById(`gl_s_${i}`)?.value || ''
+    };
+  });
+  saveState();
+  showToast('💪 Workout logged!');
+}
+
+function renderProgressSummary() {
+  const latest_m = state.metrics[state.metrics.length - 1];
+  const latest_b = state.bloodResults[state.bloodResults.length - 1];
+  let html = '';
+  if (!latest_m && !latest_b) {
+    document.getElementById('progressSummary').innerHTML = '<div style="color:#999;font-size:13px;text-align:center;padding:12px;">Log your first measurements above to see progress here.</div>';
+    return;
+  }
+  if (latest_m) {
+    const items = [
+      { label: 'Weight', start: 77.9, current: latest_m.weight, unit: 'kg', target: 74.5, lower: true },
+      { label: 'Waist', start: 102, current: latest_m.waist, unit: 'cm', target: 95, lower: true },
+      { label: 'Body Fat', start: 27.4, current: latest_m.bodyFat, unit: '%', target: 24, lower: true },
+      { label: 'Visceral Fat', start: 11.1, current: latest_m.visceral, unit: '', target: 10, lower: true },
+      { label: 'Body Water', start: 50.2, current: latest_m.water, unit: '%', target: 53, lower: false },
+    ];
+    items.forEach(it => {
+      if (!it.current) return;
+      const diff = it.current - it.start;
+      const good = it.lower ? diff < 0 : diff > 0;
+      const color = good ? 'var(--green)' : 'var(--red)';
+      const arrow = diff < 0 ? '↓' : '↑';
+      html += `<div class="summary-row">
+        <span class="summary-key">${it.label}</span>
+        <span class="summary-val">${it.start} → <span style="color:${color}">${it.current}${it.unit} (${arrow}${Math.abs(diff).toFixed(1)})</span></span>
+      </div>`;
+    });
+  }
+  if (latest_b) {
+    const items2 = [
+      { label: 'Homocysteine', start: 88.72, current: latest_b.homo, unit: ' µmol', lower: true },
+      { label: 'Triglycerides', start: 203, current: latest_b.trig, unit: ' mg/dL', lower: true },
+      { label: 'Vitamin D', start: 24.1, current: latest_b.vitD, unit: ' ng/ml', lower: false },
+    ];
+    items2.forEach(it => {
+      if (!it.current) return;
+      const diff = it.current - it.start;
+      const good = it.lower ? diff < 0 : diff > 0;
+      const color = good ? 'var(--green)' : 'var(--red)';
+      const arrow = diff < 0 ? '↓' : '↑';
+      html += `<div class="summary-row">
+        <span class="summary-key">${it.label}</span>
+        <span class="summary-val">${it.start} → <span style="color:${color}">${it.current}${it.unit} (${arrow}${Math.abs(diff).toFixed(1)})</span></span>
+      </div>`;
+    });
+  }
+  document.getElementById('progressSummary').innerHTML = html || '<div style="color:#999;font-size:13px;padding:4px;">Keep logging — comparisons will appear here.</div>';
+}
+
+// ==================== ACTIONS ====================
+function saveMetrics() {
+  const m = {
+    date: getTodayKey(),
+    weight: parseFloat(document.getElementById('mWeight').value) || null,
+    waist: parseFloat(document.getElementById('mWaist').value) || null,
+    bodyFat: parseFloat(document.getElementById('mBodyFat').value) || null,
+    visceral: parseFloat(document.getElementById('mVisceral').value) || null,
+    water: parseFloat(document.getElementById('mWater').value) || null,
+  };
+  if (!m.weight && !m.waist && !m.bodyFat) { showToast('Enter at least one value'); return; }
+  state.metrics.push(m);
+  saveState();
+  renderProgressSummary();
+  showToast('📊 Metrics saved!');
+  ['mWeight','mWaist','mBodyFat','mVisceral','mWater'].forEach(id => document.getElementById(id).value = '');
+}
+
+function saveBlood() {
+  const b = {
+    date: getTodayKey(),
+    homo: parseFloat(document.getElementById('bHomo').value) || null,
+    trig: parseFloat(document.getElementById('bTrig').value) || null,
+    hdl: parseFloat(document.getElementById('bHDL').value) || null,
+    hba: parseFloat(document.getElementById('bHba').value) || null,
+    vitD: parseFloat(document.getElementById('bVitD').value) || null,
+    uric: parseFloat(document.getElementById('bUric').value) || null,
+  };
+  state.bloodResults.push(b);
+  saveState();
+  renderProgressSummary();
+  showToast('🩸 Blood results saved!');
+  ['bHomo','bTrig','bHDL','bHba','bVitD','bUric'].forEach(id => document.getElementById(id).value = '');
+}
+
+function addCustomActivity() {
+  const name = document.getElementById('newActivityName').value.trim();
+  if (!name) { showToast('Enter activity name'); return; }
+  const ca = {
+    id: 'custom_' + Date.now(),
+    name,
+    time: document.getElementById('newActivityTime').value,
+    cat: document.getElementById('newActivityCat').value,
+    note: document.getElementById('newActivityNote').value.trim(),
+    days: document.getElementById('newActivityDays').value,
+  };
+  state.customActivities.push(ca);
+  saveState();
+  renderActivities();
+  renderCustomActivities();
+  showToast('✅ Activity added!');
+  document.getElementById('newActivityName').value = '';
+  document.getElementById('newActivityNote').value = '';
+}
+
+function deleteCustomActivity(idx) {
+  if (!confirm('Delete this activity?')) return;
+  state.customActivities.splice(idx, 1);
+  saveState();
+  renderActivities();
+  renderCustomActivities();
+  showToast('Deleted');
+}
+
+function resetToday() {
+  if (!confirm('Reset today\'s checklist?')) return;
+  const todayKey = getTodayKey();
+  state.completedActivities[todayKey] = {};
+  state.completedSupps[todayKey] = {};
+  state.waterGlasses = 0;
+  delete state.history[todayKey];
+  saveState();
+  render();
+  showToast('🔄 Today reset');
+}
+
+function confirmClearAll() {
+  if (!confirm('This will delete ALL your data permanently. Are you sure?')) return;
+  if (!confirm('Last chance — delete everything?')) return;
+  state = { dayType: 'walk', waterGlasses: 0, completedActivities: {}, completedSupps: {}, customActivities: [], history: {}, metrics: [], bloodResults: [], gymLogs: {} };
+  saveState();
+  render();
+  showToast('All data cleared');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'progress') { renderProgress(); renderCalendar(); renderProgressSummary(); }
+  if (name === 'add') { renderGymLog(); renderCustomActivities(); }
+}
+
+// ==================== INIT ====================
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.storage) {
+    loadState();
+  } else {
+    // Fallback to localStorage for testing in browser
+    const saved = localStorage.getItem('jatin-state-v2');
+    if (saved) try { state = { ...state, ...JSON.parse(saved) }; } catch(e) {}
+    window.storage = {
+      get: async (k) => { const v = localStorage.getItem(k); return v ? { value: v } : null; },
+      set: async (k, v) => { localStorage.setItem(k, v); return { value: v }; },
+    };
+    if (isGymDay()) state.dayType = 'gym';
+    render();
+  }
+});
+</script>
+</body>
+</html>
