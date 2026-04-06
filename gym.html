@@ -1,0 +1,1512 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jatin's Power Plan — 7-Day Strength Program</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0C0C0F;--surface:#111115;--card:#18181D;--border:#252530;
+  --accent:#F5A623;--accent2:#FF5E5E;--green:#3ECF8E;
+  --text:#F0EDE8;--muted:#777;--muted2:#444;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.header{
+  background:linear-gradient(135deg,#0C0C0F 0%,#15120a 100%);
+  border-bottom:1px solid var(--border);
+  padding:18px 32px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(12px);
+}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--accent)}
+.logo span{color:var(--text)}
+.header-meta{font-size:12px;color:var(--muted);text-align:right}
+.header-meta strong{color:var(--text);display:block;font-size:13px}
+
+/* ── DAY TABS ── */
+.day-tabs{
+  display:flex;gap:6px;padding:14px 32px;overflow-x:auto;
+  border-bottom:1px solid var(--border);background:var(--surface);
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{
+  flex-shrink:0;padding:10px 16px;border-radius:10px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;
+  cursor:pointer;transition:all .2s;text-align:center;min-width:80px;
+}
+.day-tab .dt-day{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.7}
+.day-tab .dt-focus{font-size:13px;font-weight:600;margin-top:2px}
+.day-tab .dt-type{font-size:10px;margin-top:2px;opacity:.6}
+.day-tab:hover{border-color:var(--muted2);color:var(--text)}
+.day-tab.active{background:var(--accent);border-color:var(--accent);color:#000}
+.day-tab.active .dt-day,.day-tab.active .dt-type{opacity:.7}
+.day-tab.rec.active{background:var(--green);border-color:var(--green)}
+
+/* ── PROGRESS ── */
+.progress-bar-wrap{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:10px 32px;
+}
+.progress-info{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.progress-info span{color:var(--muted)}
+.progress-info strong{color:var(--accent)}
+.pbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s ease;width:0%}
+
+/* ── MAIN ── */
+.main{max-width:1200px;margin:0 auto;padding:32px}
+.day-content{display:none}
+.day-content.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── DAY HEADER ── */
+.day-header{margin-bottom:28px}
+.day-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);
+  padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;
+}
+.day-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;line-height:1;margin-bottom:6px}
+.day-subtitle{color:var(--muted);font-size:14px}
+
+/* ── TIMELINE ── */
+.session-timeline{
+  display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:28px;
+}
+.tb{
+  flex:1;padding:14px 18px;background:var(--card);
+  border-right:1px solid var(--border);
+}
+.tb:last-child{border-right:none}
+.tb-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px}
+.tb-time{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);line-height:1}
+.tb-desc{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;
+  color:var(--muted);margin-bottom:14px;margin-top:28px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── EXERCISE GRID ── */
+.exercise-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+
+/* ── EXERCISE CARD ── */
+.exercise-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;transition:transform .2s,border-color .2s;
+  position:relative;
+}
+.exercise-card:hover{transform:translateY(-3px);border-color:rgba(245,166,35,.3)}
+.exercise-card.done{opacity:.55;border-color:var(--green)!important}
+
+/* ── VISUAL ── */
+.ex-visual{
+  height:150px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#15151C 0%,#0F0F14 100%);
+  position:relative;overflow:hidden;cursor:pointer;
+}
+.ex-visual::before{
+  content:'';position:absolute;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(245,166,35,.06) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.ex-visual svg{width:95px;height:115px;position:relative;z-index:1}
+.ex-visual .muscle-label{
+  position:absolute;bottom:8px;right:10px;font-size:9px;
+  color:rgba(245,166,35,.5);letter-spacing:1px;text-transform:uppercase;
+}
+.ex-visual .anim-hint{
+  position:absolute;bottom:8px;left:10px;font-size:9px;color:var(--muted2);
+  letter-spacing:.5px;
+}
+
+/* ── CARD BODY ── */
+.ex-body{padding:14px}
+.ex-name{font-size:15px;font-weight:600;margin-bottom:10px;color:var(--text);line-height:1.3}
+.ex-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.stat{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  padding:4px 10px;border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;
+}
+.stat .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat .sv{color:var(--accent);font-weight:700;font-size:13px;line-height:1.2}
+.ex-muscles{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.mtag{font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(245,166,35,.08);color:var(--accent);border:1px solid rgba(245,166,35,.15);font-weight:500;letter-spacing:.3px}
+.ex-tip{font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:9px;line-height:1.55}
+.ex-tip::before{content:'💡 ';font-size:11px}
+.check-btn{
+  width:100%;padding:8px;background:rgba(62,207,142,.08);
+  border:1px solid rgba(62,207,142,.2);border-radius:7px;
+  color:var(--green);font-family:'DM Sans',sans-serif;font-size:11px;
+  font-weight:600;cursor:pointer;margin-top:10px;transition:all .2s;letter-spacing:.3px;
+}
+.check-btn:hover{background:rgba(62,207,142,.15)}
+.exercise-card.done .check-btn{background:var(--green);color:#000;border-color:var(--green)}
+
+/* ── HIIT BLOCK ── */
+.hiit-block{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;
+}
+.hiit-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent2);margin-bottom:6px}
+.hiit-desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+.hiit-rounds{display:flex;gap:6px;flex-wrap:wrap}
+.hr{padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;text-align:center}
+.hr.on{background:rgba(255,94,94,.15);border:1px solid rgba(255,94,94,.3);color:#FF7B7B}
+.hr.off{background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.2);color:var(--green)}
+.hr.warm{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--accent)}
+
+/* ── RECOVERY ── */
+.rec-wrap{text-align:center;padding:40px 20px}
+.rec-emoji{font-size:56px;margin-bottom:20px;display:block}
+.rec-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:3px;margin-bottom:8px;color:var(--green)}
+.rec-sub{color:var(--muted);font-size:14px;margin-bottom:32px}
+.rec-list{display:flex;flex-direction:column;gap:12px;max-width:460px;margin:0 auto}
+.rec-item{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;display:flex;align-items:center;gap:14px;text-align:left;
+}
+.rec-item-icon{font-size:28px;flex-shrink:0}
+.rec-item h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.rec-item p{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── NUTRITION BANNER ── */
+.nutrition-banner{
+  background:linear-gradient(135deg,rgba(245,166,35,.06),rgba(255,94,94,.04));
+  border:1px solid rgba(245,166,35,.15);border-radius:14px;
+  padding:18px 22px;margin-top:28px;display:flex;align-items:flex-start;gap:14px;
+}
+.nutrition-banner-icon{font-size:26px;flex-shrink:0}
+.nutrition-banner h4{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:5px}
+.nutrition-banner p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── SVG ANIMATIONS ── */
+@keyframes press-up{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes squat-d{0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(.88) translateY(6px)}}
+@keyframes curl-a{0%,100%{transform:rotate(0)}50%{transform:rotate(-25deg)}}
+@keyframes pull-d{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+@keyframes row-b{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
+@keyframes raise-s{0%,100%{transform:rotate(0)}50%{transform:rotate(35deg)}}
+@keyframes knee-u{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes twist-s{0%,100%{transform:rotate(0)}50%{transform:rotate(20deg)}}
+@keyframes climb{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}
+@keyframes plank-b{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.02)}}
+@keyframes lunge-d{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@keyframes hinge-f{0%,100%{transform:rotate(0)}50%{transform:rotate(10deg)}}
+@keyframes overhead-p{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.anim-press{animation:press-up 2.2s ease-in-out infinite}
+.anim-squat{animation:squat-d 2.5s ease-in-out infinite}
+.anim-curl{animation:curl-a 2s ease-in-out infinite;transform-origin:bottom center}
+.anim-pull{animation:pull-d 2s ease-in-out infinite}
+.anim-row{animation:row-b 2s ease-in-out infinite}
+.anim-raise{animation:raise-s 2s ease-in-out infinite;transform-origin:center}
+.anim-knee{animation:knee-u 1.8s ease-in-out infinite}
+.anim-twist{animation:twist-s 2.2s ease-in-out infinite;transform-origin:center}
+.anim-climb{animation:climb 1.2s ease-in-out infinite}
+.anim-plank{animation:plank-b 3s ease-in-out infinite}
+.anim-lunge{animation:lunge-d 2s ease-in-out infinite}
+.anim-hinge{animation:hinge-f 2.5s ease-in-out infinite;transform-origin:top center}
+.anim-overhead{animation:overhead-p 2.2s ease-in-out infinite}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .main{padding:20px 14px}
+  .day-tabs{padding:10px 14px}
+  .header{padding:14px 16px}
+  .day-title{font-size:38px}
+  .session-timeline{flex-direction:column}
+  .tb{border-right:none;border-bottom:1px solid var(--border)}
+  .tb:last-child{border-bottom:none}
+  .exercise-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .exercise-grid{grid-template-columns:1fr}
+  .progress-bar-wrap,.header{padding-left:14px;padding-right:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">JATIN'S <span>POWER PLAN</span></div>
+  <div class="header-meta">
+    <strong>7-Day Strength Program</strong>
+    Apr 2026 · 50 min/session
+  </div>
+</div>
+
+<!-- DAY TABS -->
+<div class="day-tabs">
+  <button class="day-tab active" onclick="switchDay(0)">
+    <div class="dt-day">Monday</div>
+    <div class="dt-focus">PUSH</div>
+    <div class="dt-type">Chest · Shoulders</div>
+  </button>
+  <button class="day-tab" onclick="switchDay(1)">
+    <div class="dt-day">Tuesday</div>
+    <div class="dt-focus">PULL</div>
+    <div class="dt-type">Back · Biceps</div>
+  </button>
+  <button class="day-tab" onclick="switchDay(2)">
+    <div class="dt-day">Wednesday</div>
+    <div class="dt-focus">LEGS</div>
+    <div class="dt-type">Legs · Core</div>
+  </button>
+  <button class="day-tab rec" onclick="switchDay(3)">
+    <div class="dt-day">Thursday</div>
+    <div class="dt-focus">REST</div>
+    <div class="dt-type">Recovery</div>
+  </button>
+  <button class="day-tab" onclick="switchDay(4)">
+    <div class="dt-day">Friday</div>
+    <div class="dt-focus">FULL</div>
+    <div class="dt-type">Full Body</div>
+  </button>
+  <button class="day-tab" onclick="switchDay(5)">
+    <div class="dt-day">Saturday</div>
+    <div class="dt-focus">HIIT</div>
+    <div class="dt-type">Cardio · Core</div>
+  </button>
+  <button class="day-tab rec" onclick="switchDay(6)">
+    <div class="dt-day">Sunday</div>
+    <div class="dt-focus">REST</div>
+    <div class="dt-type">Recovery</div>
+  </button>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="progress-info">
+    <span id="prog-label">Today's Progress</span>
+    <strong id="prog-count">0 / 0 exercises</strong>
+  </div>
+  <div class="pbar"><div class="pfill" id="pfill"></div></div>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 0 — MONDAY — PUSH -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content active" id="day-0">
+  <div class="day-header">
+    <div class="day-badge">Day 1 · Monday</div>
+    <div class="day-title">PUSH DAY</div>
+    <div class="day-subtitle">Chest · Shoulders · Triceps — Build pressing strength and upper body width</div>
+  </div>
+  <div class="session-timeline">
+    <div class="tb"><div class="tb-label">Warm-up</div><div class="tb-time">0–5</div><div class="tb-desc">Treadmill walk + arm circles</div></div>
+    <div class="tb"><div class="tb-label">Main Workout</div><div class="tb-time">5–45</div><div class="tb-desc">6 exercises · 3 sets each</div></div>
+    <div class="tb"><div class="tb-label">Cool-down</div><div class="tb-time">45–50</div><div class="tb-desc">Chest & shoulder stretch</div></div>
+  </div>
+  <div class="section-label">Exercises</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- DUMBBELL BENCH PRESS -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-press">
+          <rect x="8" y="78" width="84" height="9" rx="3" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <rect x="4" y="87" width="6" height="20" rx="2" fill="#22222A" stroke="#383845" stroke-width="1"/>
+          <rect x="90" y="87" width="6" height="20" rx="2" fill="#22222A" stroke="#383845" stroke-width="1"/>
+          <circle cx="50" cy="50" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="58" x2="50" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="43" y1="65" x2="30" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="57" y1="65" x2="70" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="36" y1="66" x2="22" y2="46" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="64" y1="66" x2="78" y2="46" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="14" y="40" width="14" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="72" y="40" width="14" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Chest</div><div class="anim-hint">↕ animated</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Bench Press</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Chest</span><span class="mtag">Triceps</span><span class="mtag">Front Shoulder</span></div>
+        <div class="ex-tip">Lie flat on bench. Push dumbbells up and together. 2 seconds down, 1 second up. Don't bounce off chest.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- INCLINE DUMBBELL PRESS -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-press">
+          <line x1="10" y1="100" x2="75" y2="55" stroke="#383845" stroke-width="7" stroke-linecap="round"/>
+          <line x1="75" y1="55" x2="75" y2="105" stroke="#383845" stroke-width="4"/>
+          <circle cx="40" cy="44" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="40" y1="52" x2="35" y2="70" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="32" y1="60" x2="17" y2="45" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="47" y1="60" x2="62" y2="45" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="8" y="39" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="64" y="39" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="35" y1="70" x2="28" y2="85" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="35" y1="70" x2="42" y2="86" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Upper Chest</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Incline Dumbbell Press</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Upper Chest</span><span class="mtag">Shoulder</span></div>
+        <div class="ex-tip">Set bench at 30–45° angle. Push upward and slightly inward. Great for upper chest definition.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- SEATED SHOULDER PRESS -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-overhead">
+          <rect x="30" y="80" width="40" height="8" rx="2" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <line x1="50" y1="88" x2="50" y2="110" stroke="#383845" stroke-width="4"/>
+          <circle cx="50" cy="22" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="30" x2="50" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="38" x2="34" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="38" x2="66" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="38" y1="40" x2="20" y2="22" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="62" y1="40" x2="80" y2="22" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="12" y="16" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="75" y="16" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Shoulders</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Shoulder Press (Seated)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Deltoids</span><span class="mtag">Triceps</span></div>
+        <div class="ex-tip">Sit upright, back supported. Start at ear level. Press straight up. Don't arch your lower back.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- LATERAL RAISES -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <circle cx="50" cy="18" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="26" x2="50" y2="65" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="68" x2="32" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="68" x2="68" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-raise">
+            <line x1="42" y1="38" x2="16" y2="28" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="58" y1="38" x2="84" y2="28" stroke="#F5A623" stroke-width="2.2"/>
+            <circle cx="13" cy="26" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+            <circle cx="87" cy="26" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Side Delts</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Lateral Raises</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12–15</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Side Deltoid</span></div>
+        <div class="ex-tip">Stand tall. Lift arms to sides up to shoulder height, elbows slightly bent. Lead with elbows, not hands. Use light weight.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- TRICEP PUSHDOWN -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <line x1="50" y1="5" x2="50" y2="25" stroke="#555" stroke-width="3"/>
+          <rect x="38" y="25" width="24" height="6" rx="2" fill="none" stroke="#555" stroke-width="1.5"/>
+          <circle cx="50" cy="16" r="6" stroke="#F5A623" stroke-width="2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="22" x2="50" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="58" x2="30" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="58" x2="70" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-pull">
+            <line x1="42" y1="36" x2="30" y2="30" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="58" y1="36" x2="70" y2="30" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="30" y1="30" x2="35" y2="60" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="70" y1="30" x2="65" y2="60" stroke="#F5A623" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Triceps</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Tricep Pushdown (Cable)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12–15</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Triceps</span></div>
+        <div class="ex-tip">Stand facing cable machine. Keep elbows locked at sides. Push bar down until arms are straight. Squeeze at bottom.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="0">
+      <div class="ex-visual">
+        <!-- PLANK -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-plank">
+          <line x1="5" y1="85" width="90" x2="95" y2="85" stroke="#383845" stroke-width="2"/>
+          <circle cx="82" cy="52" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="75" y1="56" x2="12" y2="72" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="70" y1="62" x2="70" y2="85" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="62" y1="62" x2="62" y2="85" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="15" y1="72" x2="20" y2="85" stroke="#F5A623" stroke-width="2.2"/>
+          <circle cx="20" cy="85" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          <circle cx="28" cy="85" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Core</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Plank (Core Finisher)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Hold</span><span class="sv">30–45s</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">30s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Core</span><span class="mtag">Abs</span><span class="mtag">Stability</span></div>
+        <div class="ex-tip">Forearms on floor, body straight like a board. Don't let hips sag or rise. Breathe steadily. Core tight throughout.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+  <div class="nutrition-banner">
+    <div class="nutrition-banner-icon">🥜</div>
+    <div>
+      <h4>Pre-Push Fuel (30 min before)</h4>
+      <p>Small banana + 5 soaked almonds. Post-workout within 45 min: paneer bhurji or dal + roti. Today focus on shoulder stretches after the session to avoid stiffness.</p>
+    </div>
+  </div>
+</div><!-- end day 0 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 1 — TUESDAY — PULL -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-1">
+  <div class="day-header">
+    <div class="day-badge">Day 2 · Tuesday</div>
+    <div class="day-title">PULL DAY</div>
+    <div class="day-subtitle">Back · Biceps — Build a strong back to fix posture and reduce snoring risk</div>
+  </div>
+  <div class="session-timeline">
+    <div class="tb"><div class="tb-label">Warm-up</div><div class="tb-time">0–5</div><div class="tb-desc">Band pull-aparts or cat-cow stretch</div></div>
+    <div class="tb"><div class="tb-label">Main Workout</div><div class="tb-time">5–45</div><div class="tb-desc">6 exercises · 3 sets each</div></div>
+    <div class="tb"><div class="tb-label">Cool-down</div><div class="tb-time">45–50</div><div class="tb-desc">Lat & bicep stretch</div></div>
+  </div>
+  <div class="section-label">Exercises</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- LAT PULLDOWN -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <line x1="10" y1="8" x2="90" y2="8" stroke="#555" stroke-width="2.5"/>
+          <line x1="50" y1="8" x2="50" y2="20" stroke="#555" stroke-width="2"/>
+          <rect x="32" y="20" width="36" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="30" y="80" width="40" height="8" rx="2" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <circle cx="50" cy="42" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="50" x2="50" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="57" x2="32" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="57" x2="68" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-pull">
+            <line x1="42" y1="50" x2="32" y2="25" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="58" y1="50" x2="68" y2="25" stroke="#F5A623" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Lats / Back</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Lat Pulldown (Cable)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Lats</span><span class="mtag">Rear Delts</span><span class="mtag">Biceps</span></div>
+        <div class="ex-tip">Sit at cable machine, grip bar wide. Pull bar down to upper chest. Think of driving elbows toward hips. Don't lean back excessively.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- SEATED CABLE ROW -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-row">
+          <line x1="5" y1="75" x2="5" y2="50" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+          <line x1="5" y1="62" x2="20" y2="62" stroke="#888" stroke-width="1.5"/>
+          <rect x="60" y="70" width="35" height="8" rx="2" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <circle cx="70" cy="48" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="70" y1="56" x2="70" y2="70" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="63" y1="63" x2="50" y2="70" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="77" y1="63" x2="90" y2="70" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="62" y1="54" x2="20" y2="62" stroke="#F5A623" stroke-width="2"/>
+          <line x1="78" y1="54" x2="20" y2="62" stroke="rgba(245,166,35,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+        </svg>
+        <div class="muscle-label">Mid Back</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Seated Cable Row</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Mid Back</span><span class="mtag">Rhomboids</span><span class="mtag">Biceps</span></div>
+        <div class="ex-tip">Sit upright on cable row machine. Pull handle to lower chest. Squeeze shoulder blades together at the end. Keep torso still — don't swing.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- SINGLE ARM DUMBBELL ROW -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <rect x="5" y="70" width="35" height="8" rx="3" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <line x1="5" y1="70" x2="5" y2="110" stroke="#383845" stroke-width="4"/>
+          <circle cx="62" cy="32" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="62" y1="39" x2="55" y2="70" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="55" y1="54" x2="20" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-row">
+            <line x1="68" y1="48" x2="82" y2="35" stroke="#F5A623" stroke-width="2.2"/>
+            <rect x="82" y="28" width="12" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          </g>
+          <line x1="48" y1="70" x2="38" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="62" y1="70" x2="72" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Lats / Back</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Single-Arm Dumbbell Row</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10 each</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Lats</span><span class="mtag">Upper Back</span></div>
+        <div class="ex-tip">One knee and hand on bench. Pull dumbbell to hip. Elbow goes past your back. Keep shoulders square and back flat.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- FACE PULLS -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <line x1="5" y1="48" x2="5" y2="30" stroke="#555" stroke-width="4"/>
+          <circle cx="5" cy="39" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          <circle cx="55" cy="28" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="55" y1="35" x2="55" y2="68" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="48" y1="72" x2="35" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="62" y1="72" x2="75" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-row">
+            <line x1="48" y1="40" x2="20" y2="39" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="62" y1="40" x2="20" y2="39" stroke="#F5A623" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Rear Delts</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Face Pulls (Cable)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">15</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Rear Deltoid</span><span class="mtag">Rotator Cuff</span></div>
+        <div class="ex-tip">Set cable at face height. Pull rope toward your face, separating hands at the end. Excellent for shoulder health and posture.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- BICEP CURL -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <circle cx="50" cy="16" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="23" x2="50" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="65" x2="32" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="65" x2="68" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-curl">
+            <line x1="42" y1="34" x2="28" y2="42" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="28" y1="42" x2="22" y2="28" stroke="#F5A623" stroke-width="2.2"/>
+            <rect x="14" y="22" width="12" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          </g>
+          <line x1="58" y1="34" x2="72" y2="42" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="72" y1="42" x2="78" y2="28" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="74" y="22" width="12" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Biceps</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Bicep Curl</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Biceps</span><span class="mtag">Forearms</span></div>
+        <div class="ex-tip">Stand tall, elbows fixed at sides. Curl up, twist wrist outward (supinate) at top. Squeeze bicep. Slow on the way down.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="1">
+      <div class="ex-visual">
+        <!-- DEAD BUG -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-knee">
+          <line x1="5" y1="88" x2="95" y2="88" stroke="#383845" stroke-width="2"/>
+          <circle cx="50" cy="62" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="70" x2="50" y2="88" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="42" y1="72" x2="25" y2="88" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="58" y1="72" x2="75" y2="88" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="72" x2="28" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="72" x2="85" y2="60" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="28" y1="55" x2="16" y2="40" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Core</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dead Bug (Core)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10 each</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">30s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Core</span><span class="mtag">Lower Abs</span><span class="mtag">Hip Flexors</span></div>
+        <div class="ex-tip">Lie on back. Extend opposite arm and leg simultaneously while keeping lower back pressed to floor. Breathe out as you extend. Excellent for belly fat.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nutrition-banner">
+    <div class="nutrition-banner-icon">🫘</div>
+    <div>
+      <h4>Back Day Nutrition</h4>
+      <p>Post-workout: rajma or chhole (high protein + carbs) with roti. Back exercises directly improve posture which helps reduce belly appearance even before fat loss.</p>
+    </div>
+  </div>
+</div><!-- end day 1 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 2 — WEDNESDAY — LEGS + CORE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-2">
+  <div class="day-header">
+    <div class="day-badge">Day 3 · Wednesday</div>
+    <div class="day-title">LEGS + CORE</div>
+    <div class="day-subtitle">Legs are the body's biggest muscles — highest fat-burning & hormone release of any session</div>
+  </div>
+  <div class="session-timeline">
+    <div class="tb"><div class="tb-label">Warm-up</div><div class="tb-time">0–5</div><div class="tb-desc">Bodyweight squats + leg swings</div></div>
+    <div class="tb"><div class="tb-label">Main Workout</div><div class="tb-time">5–42</div><div class="tb-desc">5 leg + 3 core exercises</div></div>
+    <div class="tb"><div class="tb-label">Cool-down</div><div class="tb-time">42–50</div><div class="tb-desc">Hip flexor + hamstring stretch</div></div>
+  </div>
+  <div class="section-label">Leg Exercises</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- GOBLET SQUAT -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-squat">
+          <circle cx="50" cy="16" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="23" x2="50" y2="60" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="40" y="40" width="20" height="12" rx="3" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="42" y1="36" x2="40" y2="47" stroke="#F5A623" stroke-width="2"/>
+          <line x1="58" y1="36" x2="60" y2="47" stroke="#F5A623" stroke-width="2"/>
+          <line x1="44" y1="60" x2="25" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="60" x2="75" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="25" y1="82" x2="20" y2="105" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="75" y1="82" x2="80" y2="105" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Quads / Glutes</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Goblet Squat (Dumbbell)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">4</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Quads</span><span class="mtag">Glutes</span><span class="mtag">Core</span></div>
+        <div class="ex-tip">Hold dumbbell at chest. Feet shoulder-width apart. Squat deep, knees track over toes. Keep chest up. This is the best beginner squat pattern.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- ROMANIAN DEADLIFT -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-hinge">
+          <circle cx="65" cy="22" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="65" y1="29" x2="30" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="60" y1="33" x2="18" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="5" y="50" width="16" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="42" y1="56" x2="38" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="52" y1="56" x2="56" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="38" y1="82" x2="34" y2="108" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="82" x2="60" y2="108" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Hamstrings</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Romanian Deadlift (Dumbbell)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10–12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">75s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Hamstrings</span><span class="mtag">Glutes</span><span class="mtag">Lower Back</span></div>
+        <div class="ex-tip">Stand holding dumbbells. Hinge at hips (not waist), push hips back, keep back flat. Feel the hamstring stretch. Drive hips forward to stand.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- LEG PRESS -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <rect x="5" y="60" width="50" height="40" rx="4" fill="#18181D" stroke="#383845" stroke-width="1.5"/>
+          <circle cx="30" cy="44" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="30" y1="52" x2="30" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-press">
+            <line x1="24" y1="56" x2="12" y2="35" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="36" y1="56" x2="48" y2="35" stroke="#F5A623" stroke-width="2.2"/>
+            <rect x="55" y="25" width="35" height="20" rx="4" fill="#1a1a22" stroke="#444" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Quads / Glutes</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Leg Press (Machine)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12–15</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Quads</span><span class="mtag">Glutes</span><span class="mtag">Hamstrings</span></div>
+        <div class="ex-tip">Feet shoulder-width on platform. Push through heels. Don't lock knees fully at the top. Keep lower back pressed against the pad throughout.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- WALKING LUNGES -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-lunge">
+          <circle cx="45" cy="16" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="45" y1="23" x2="45" y2="58" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="38" y1="32" x2="28" y2="46" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="52" y1="32" x2="62" y2="46" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="38" y1="58" x2="22" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="52" y1="58" x2="70" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="22" y1="78" x2="16" y2="108" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="70" y1="78" x2="70" y2="105" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="5" y1="105" x2="95" y2="105" stroke="#383845" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Quads / Glutes</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Walking Lunges</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10 each leg</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Quads</span><span class="mtag">Glutes</span><span class="mtag">Balance</span></div>
+        <div class="ex-tip">Step forward, lower until back knee nearly touches floor. Front knee stays behind toes. Step through to next lunge. Keep torso upright.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- LEG CURL -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <rect x="10" y="52" width="80" height="12" rx="3" fill="#18181D" stroke="#383845" stroke-width="1.5"/>
+          <circle cx="50" cy="30" r="8" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="38" x2="50" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="46" x2="22" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="46" x2="78" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-curl">
+            <line x1="36" y1="64" x2="28" y2="90" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="64" y1="64" x2="72" y2="90" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="28" y1="90" x2="22" y2="75" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="72" y1="90" x2="78" y2="75" stroke="#F5A623" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Hamstrings</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Leg Curl (Machine)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Hamstrings</span></div>
+        <div class="ex-tip">Lie face down on machine. Curl heels toward glutes. Squeeze at top. Lower slowly. Most people neglect hamstrings — don't!</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="section-label">Core Circuit</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- HANGING KNEE RAISES -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <line x1="20" y1="5" x2="80" y2="5" stroke="#555" stroke-width="3"/>
+          <line x1="40" y1="5" x2="40" y2="18" stroke="#555" stroke-width="2"/>
+          <line x1="60" y1="5" x2="60" y2="18" stroke="#555" stroke-width="2"/>
+          <circle cx="50" cy="26" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="40" y1="18" x2="44" y2="24" stroke="#F5A623" stroke-width="2"/>
+          <line x1="60" y1="18" x2="56" y2="24" stroke="#F5A623" stroke-width="2"/>
+          <line x1="50" y1="33" x2="50" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="38" x2="38" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="38" x2="62" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <g class="anim-knee">
+            <line x1="44" y1="62" x2="32" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="56" y1="62" x2="68" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="32" y1="82" x2="38" y2="105" stroke="#F5A623" stroke-width="2.2"/>
+            <line x1="68" y1="82" x2="62" y2="105" stroke="#F5A623" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label">Lower Abs</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Hanging Knee Raises</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">12–15</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">—</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Lower Abs</span><span class="mtag">Hip Flexors</span><span class="mtag">Grip</span></div>
+        <div class="ex-tip">Hang from pull-up bar. Bring both knees up toward chest. Lower slowly — no swinging. This specifically targets lower belly fat area.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- AB WHEEL / PLANK -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-plank">
+          <line x1="5" y1="90" x2="95" y2="90" stroke="#383845" stroke-width="2"/>
+          <circle cx="78" cy="58" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="71" y1="62" x2="15" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="20" y1="78" x2="20" y2="90" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="10" y1="90" x2="30" y2="90" stroke="#F5A623" stroke-width="1"/>
+          <circle cx="65" cy="74" r="8" fill="none" stroke="#888" stroke-width="2"/>
+          <line x1="65" y1="66" x2="65" y2="82" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Core / Abs</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Ab Wheel Rollout (or Plank)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10 / 30s</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">—</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Full Core</span><span class="mtag">Abs</span><span class="mtag">Shoulders</span></div>
+        <div class="ex-tip">Kneel on mat. Roll wheel forward while keeping core tight. Pull back using abs. If too hard, do plank instead. Build up gradually.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="2">
+      <div class="ex-visual">
+        <!-- RUSSIAN TWIST -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-twist">
+          <line x1="5" y1="95" x2="95" y2="95" stroke="#383845" stroke-width="2"/>
+          <circle cx="50" cy="55" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="62" x2="30" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="50" y1="62" x2="70" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="30" y1="82" x2="22" y2="95" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="70" y1="82" x2="78" y2="95" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="65" x2="22" y2="58" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="65" x2="78" y2="58" stroke="#F5A623" stroke-width="2.2"/>
+          <circle cx="20" cy="56" r="5" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Obliques</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Russian Twist</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">20 total</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">45s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Obliques</span><span class="mtag">Core</span></div>
+        <div class="ex-tip">Sit with knees bent, lean back 45°. Hold weight or clasp hands. Twist torso left and right. Feet can be on floor for beginners. Targets love handles directly.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nutrition-banner">
+    <div class="nutrition-banner-icon">⚡</div>
+    <div>
+      <h4>Legs Day = Most Important Day</h4>
+      <p>This session releases the most testosterone and growth hormone of any workout — directly burning belly fat. Legs day is hard but is your single biggest tool. Post-workout: dal rice or khichdi with curd.</p>
+    </div>
+  </div>
+</div><!-- end day 2 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 3 — THURSDAY — RECOVERY -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-3">
+  <div class="day-header">
+    <div class="day-badge" style="background:rgba(62,207,142,.08);border-color:rgba(62,207,142,.2);color:var(--green)">Day 4 · Thursday</div>
+    <div class="day-title" style="color:var(--green)">REST DAY</div>
+    <div class="day-subtitle">Recovery is where fat loss and muscle growth actually happen. Don't skip this.</div>
+  </div>
+  <div class="rec-wrap">
+    <span class="rec-emoji">🌿</span>
+    <div class="rec-title">ACTIVE RECOVERY</div>
+    <div class="rec-sub">No weights today. Your muscles repair and grow on rest days. Cortisol drops. This is when fat loss happens.</div>
+    <div class="rec-list">
+      <div class="rec-item">
+        <div class="rec-item-icon">🚶</div>
+        <div>
+          <h4>Brisk Walk — 20–30 min</h4>
+          <p>Post-lunch or evening. Keep it comfortable pace, not intense. Helps insulin sensitivity — critical for your HOMA-IR of 4.23.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">🧘</div>
+        <div>
+          <h4>Full Body Stretch — 10 min</h4>
+          <p>Hip flexors, hamstrings, chest opener, shoulder cross-body stretch. Reduces soreness from legs day and improves mobility.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">🫁</div>
+        <div>
+          <h4>Deep Breathing / Meditation — 5 min</h4>
+          <p>Your cortisol was 16.2 µg/dL (upper range). Stress drives belly fat directly. Even 5 minutes of box breathing makes a difference.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">💊</div>
+        <div>
+          <h4>Supplement Check</h4>
+          <p>Take your Berberine with meals, Magnesium Glycinate at night, and B12 sublingual. Rest days are great for reviewing your stack.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- end day 3 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 4 — FRIDAY — FULL BODY -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-4">
+  <div class="day-header">
+    <div class="day-badge">Day 5 · Friday</div>
+    <div class="day-title">FULL BODY</div>
+    <div class="day-subtitle">Big compound movements — keeps metabolism elevated 24–36 hours after the session</div>
+  </div>
+  <div class="session-timeline">
+    <div class="tb"><div class="tb-label">Warm-up</div><div class="tb-time">0–5</div><div class="tb-desc">Light cardio + dynamic stretch</div></div>
+    <div class="tb"><div class="tb-label">Main Workout</div><div class="tb-time">5–45</div><div class="tb-desc">6 compound exercises</div></div>
+    <div class="tb"><div class="tb-label">Cool-down</div><div class="tb-time">45–50</div><div class="tb-desc">Full body stretch</div></div>
+  </div>
+  <div class="section-label">Compound Exercises</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-squat">
+          <circle cx="50" cy="14" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="30" y1="25" x2="70" y2="25" stroke="#888" stroke-width="3"/>
+          <line x1="50" y1="21" x2="50" y2="60" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="32" x2="28" y2="28" stroke="#F5A623" stroke-width="2"/>
+          <line x1="56" y1="32" x2="72" y2="28" stroke="#F5A623" stroke-width="2"/>
+          <line x1="44" y1="60" x2="26" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="60" x2="74" y2="82" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="26" y1="82" x2="22" y2="108" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="74" y1="82" x2="78" y2="108" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Full Body</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Barbell / Dumbbell Squat</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">4</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">8–10</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">90s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Quads</span><span class="mtag">Glutes</span><span class="mtag">Core</span><span class="mtag">Full Body</span></div>
+        <div class="ex-tip">King of all exercises. Bar rests on upper traps. Squat until thighs parallel or below. Drive through heels to stand. Core braced throughout.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-hinge">
+          <circle cx="60" cy="20" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="60" y1="27" x2="25" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="55" y1="30" x2="14" y2="52" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="4" y="47" width="14" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="4" y="54" width="14" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="42" y1="54" x2="38" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="52" y1="54" x2="56" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="38" y1="80" x2="34" y2="106" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="80" x2="60" y2="106" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Hamstrings / Back</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Romanian Deadlift</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">75s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Hamstrings</span><span class="mtag">Glutes</span><span class="mtag">Back</span></div>
+        <div class="ex-tip">Hinge at hips. Back stays flat and long. Feel the stretch down back of legs. This is NOT a lower back exercise — it's a hamstring exercise.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-press">
+          <rect x="8" y="78" width="84" height="9" rx="3" fill="#22222A" stroke="#383845" stroke-width="1.2"/>
+          <circle cx="50" cy="48" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="55" x2="50" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="43" y1="64" x2="30" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="57" y1="64" x2="70" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="36" y1="65" x2="22" y2="45" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="64" y1="65" x2="78" y2="45" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="14" y="39" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="73" y="39" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Chest</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Bench Press</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Chest</span><span class="mtag">Triceps</span></div>
+        <div class="ex-tip">Same as Monday but today's goal is strength. Try to lift slightly heavier than Monday. Progressive overload is the key to results.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <!-- BENT OVER ROW -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-row">
+          <circle cx="62" cy="25" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="62" y1="32" x2="30" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="35" x2="18" y2="55" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="6" y="50" width="15" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="6" y="57" width="15" height="5" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="44" y1="56" x2="40" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="52" y1="56" x2="56" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="40" y1="80" x2="36" y2="106" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="80" x2="60" y2="106" stroke="#F5A623" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label">Back / Lats</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Bent-over Dumbbell Row</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Lats</span><span class="mtag">Mid Back</span><span class="mtag">Biceps</span></div>
+        <div class="ex-tip">Hinge forward at hips ~45°, back flat. Row both dumbbells to hips simultaneously. Squeeze shoulder blades together. Great posterior chain builder.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-overhead">
+          <circle cx="50" cy="18" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="50" y1="25" x2="50" y2="68" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="44" y1="72" x2="32" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="56" y1="72" x2="68" y2="100" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="42" y1="36" x2="18" y2="18" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="58" y1="36" x2="82" y2="18" stroke="#F5A623" stroke-width="2.2"/>
+          <rect x="10" y="12" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+          <rect x="77" y="12" width="13" height="6" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Shoulders</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell Overhead Press (Standing)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">10</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">60s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Deltoids</span><span class="mtag">Triceps</span><span class="mtag">Core stability</span></div>
+        <div class="ex-tip">Standing version engages core much more than seated. Press up, avoid arching lower back. Brace abs throughout. Great full-body stability exercise.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="4">
+      <div class="ex-visual">
+        <!-- MOUNTAIN CLIMBERS -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-climb">
+          <line x1="5" y1="95" x2="95" y2="95" stroke="#383845" stroke-width="2"/>
+          <circle cx="78" cy="35" r="7" stroke="#F5A623" stroke-width="2.2" fill="rgba(245,166,35,.08)"/>
+          <line x1="78" y1="42" x2="25" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="28" y1="62" x2="22" y2="80" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="22" y1="80" x2="14" y2="95" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="72" y1="42" x2="68" y2="62" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="68" y1="62" x2="80" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <line x1="58" y1="62" x2="50" y2="78" stroke="#F5A623" stroke-width="2.2"/>
+          <circle cx="22" cy="80" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          <circle cx="14" cy="95" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label">Core / Cardio</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Mountain Climbers</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Sets</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Time</span><span class="sv">30 sec</span></div>
+          <div class="stat"><span class="sl">Rest</span><span class="sv">30s</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Core</span><span class="mtag">Hip Flexors</span><span class="mtag">Cardio</span></div>
+        <div class="ex-tip">Start in push-up position. Drive knees alternately toward chest rapidly. Keep hips level. This is your metabolic finisher — go fast!</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nutrition-banner">
+    <div class="nutrition-banner-icon">🔥</div>
+    <div>
+      <h4>Friday Full Body = Metabolic Boost Weekend</h4>
+      <p>This session elevates your metabolism for the entire weekend. Post-workout: roti + paneer sabzi or tofu stir-fry with vegetables. Hydrate well — aim 2.5–3L water today.</p>
+    </div>
+  </div>
+</div><!-- end day 4 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 5 — SATURDAY — HIIT + CORE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-5">
+  <div class="day-header">
+    <div class="day-badge" style="color:var(--accent2);background:rgba(255,94,94,.08);border-color:rgba(255,94,94,.2)">Day 6 · Saturday</div>
+    <div class="day-title" style="color:var(--accent2)">HIIT + CORE</div>
+    <div class="day-subtitle">Pure metabolic fat burning — burns visceral belly fat most efficiently of any exercise type</div>
+  </div>
+  <div class="session-timeline">
+    <div class="tb"><div class="tb-label">Warm-up</div><div class="tb-time">0–5</div><div class="tb-desc">Easy walk or light jog</div></div>
+    <div class="tb"><div class="tb-label">HIIT Cardio</div><div class="tb-time">5–25</div><div class="tb-desc">8 rounds, treadmill / bike</div></div>
+    <div class="tb"><div class="tb-label">Core Circuit</div><div class="tb-time">25–45</div><div class="tb-desc">3 rounds, 5 exercises</div></div>
+    <div class="tb"><div class="tb-label">Stretch</div><div class="tb-time">45–50</div><div class="tb-desc">Full body cooldown</div></div>
+  </div>
+
+  <div class="section-label">HIIT Protocol</div>
+  <div class="hiit-block">
+    <div class="hiit-title">8-ROUND INTERVAL PROTOCOL</div>
+    <div class="hiit-desc">Choose treadmill, stationary bike, or elliptical. Start easy, go hard on work intervals.</div>
+    <div class="hiit-rounds">
+      <div class="hr warm">2 min · Warm-up easy</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr on">30 sec · MAX effort</div>
+      <div class="hr off">90 sec · Easy recover</div>
+      <div class="hr warm">2 min · Cool-down walk</div>
+    </div>
+  </div>
+
+  <div class="section-label">Core Circuit (3 Rounds)</div>
+  <div class="exercise-grid">
+
+    <div class="exercise-card" data-day="5">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-plank">
+          <line x1="5" y1="85" x2="95" y2="85" stroke="#383845" stroke-width="2"/>
+          <circle cx="82" cy="52" r="7" stroke="#FF5E5E" stroke-width="2.2" fill="rgba(255,94,94,.08)"/>
+          <line x1="75" y1="56" x2="12" y2="72" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="20" y1="72" x2="20" y2="85" stroke="#FF5E5E" stroke-width="2.2"/>
+          <circle cx="20" cy="85" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          <circle cx="28" cy="85" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+          <line x1="70" y1="62" x2="70" y2="85" stroke="#FF5E5E" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label" style="color:rgba(255,94,94,.5)">Core</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Plank Hold</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Rounds</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Hold</span><span class="sv">45 sec</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Core</span><span class="mtag">Abs</span><span class="mtag">Stability</span></div>
+        <div class="ex-tip">Hold steady. Every second gets harder. Breathe. Belly tight. This is where mental strength meets physical.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="5">
+      <div class="ex-visual">
+        <!-- LEG RAISES -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-knee">
+          <line x1="5" y1="75" x2="95" y2="75" stroke="#383845" stroke-width="2"/>
+          <circle cx="50" cy="65" r="7" stroke="#FF5E5E" stroke-width="2.2" fill="rgba(255,94,94,.08)"/>
+          <line x1="50" y1="72" x2="50" y2="75" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="44" y1="72" x2="28" y2="75" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="56" y1="72" x2="72" y2="75" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="44" y1="72" x2="32" y2="40" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="56" y1="72" x2="68" y2="40" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="32" y1="40" x2="28" y2="18" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="68" y1="40" x2="72" y2="18" stroke="#FF5E5E" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label" style="color:rgba(255,94,94,.5)">Lower Abs</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Lying Leg Raises</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Rounds</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">15</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Lower Abs</span><span class="mtag">Hip Flexors</span></div>
+        <div class="ex-tip">Lie flat. Raise straight legs to 90°. Lower slowly without touching floor. Keep lower back pressed down. Targets your lower belly directly.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="5">
+      <div class="ex-visual">
+        <!-- BICYCLE CRUNCHES -->
+        <svg viewBox="0 0 100 120" fill="none">
+          <line x1="5" y1="80" x2="95" y2="80" stroke="#383845" stroke-width="2"/>
+          <circle cx="50" cy="65" r="7" stroke="#FF5E5E" stroke-width="2.2" fill="rgba(255,94,94,.08)"/>
+          <line x1="44" y1="69" x2="22" y2="80" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="56" y1="69" x2="78" y2="80" stroke="#FF5E5E" stroke-width="2.2"/>
+          <g class="anim-twist">
+            <line x1="44" y1="65" x2="28" y2="55" stroke="#FF5E5E" stroke-width="2.2"/>
+            <line x1="56" y1="65" x2="78" y2="45" stroke="#FF5E5E" stroke-width="2.2"/>
+            <line x1="78" y1="45" x2="72" y2="28" stroke="#FF5E5E" stroke-width="2.2"/>
+          </g>
+        </svg>
+        <div class="muscle-label" style="color:rgba(255,94,94,.5)">Obliques</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Bicycle Crunches</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Rounds</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Reps</span><span class="sv">20 total</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Obliques</span><span class="mtag">Upper Abs</span></div>
+        <div class="ex-tip">Lie on back. Alternate: right elbow to left knee while right leg extends, then switch. Slow and controlled. Don't pull on your neck.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="5">
+      <div class="ex-visual">
+        <!-- SIDE PLANK -->
+        <svg viewBox="0 0 100 120" fill="none" class="anim-plank">
+          <line x1="5" y1="90" x2="95" y2="90" stroke="#383845" stroke-width="2"/>
+          <circle cx="75" cy="48" r="7" stroke="#FF5E5E" stroke-width="2.2" fill="rgba(255,94,94,.08)"/>
+          <line x1="75" y1="55" x2="10" y2="80" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="10" y1="80" x2="10" y2="90" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="50" y1="70" x2="50" y2="90" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="68" y1="58" x2="82" y2="35" stroke="#FF5E5E" stroke-width="2.2"/>
+        </svg>
+        <div class="muscle-label" style="color:rgba(255,94,94,.5)">Obliques</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Side Plank</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Rounds</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Hold</span><span class="sv">30s each</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Obliques</span><span class="mtag">Hip Abductors</span></div>
+        <div class="ex-tip">Lie on side, one forearm on floor. Raise hips so body is straight. Hold. Directly targets love handle area on sides of belly.</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-day="5">
+      <div class="ex-visual">
+        <svg viewBox="0 0 100 120" fill="none" class="anim-climb">
+          <line x1="5" y1="92" x2="95" y2="92" stroke="#383845" stroke-width="2"/>
+          <circle cx="78" cy="32" r="7" stroke="#FF5E5E" stroke-width="2.2" fill="rgba(255,94,94,.08)"/>
+          <line x1="78" y1="39" x2="22" y2="60" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="22" y1="60" x2="18" y2="80" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="18" y1="80" x2="10" y2="92" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="70" y1="42" x2="66" y2="58" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="66" y1="58" x2="55" y2="72" stroke="#FF5E5E" stroke-width="2.2"/>
+          <line x1="55" y1="68" x2="70" y2="80" stroke="#FF5E5E" stroke-width="2.2"/>
+          <circle cx="14" cy="92" r="4" fill="none" stroke="#888" stroke-width="1.5"/>
+        </svg>
+        <div class="muscle-label" style="color:rgba(255,94,94,.5)">Core / Cardio</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-name">Mountain Climbers (Fast)</div>
+        <div class="ex-stats">
+          <div class="stat"><span class="sl">Rounds</span><span class="sv">3</span></div>
+          <div class="stat"><span class="sl">Time</span><span class="sv">30 sec</span></div>
+        </div>
+        <div class="ex-muscles"><span class="mtag">Core</span><span class="mtag">Cardio burst</span></div>
+        <div class="ex-tip">Saturday finisher. Go as fast as you can. This is your cardio + core combo at end of session. Push hard — you rest tomorrow!</div>
+        <button class="check-btn" onclick="toggleDone(this)">✓ Mark as Done</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nutrition-banner">
+    <div class="nutrition-banner-icon">🧃</div>
+    <div>
+      <h4>HIIT Day — Hydration is Key</h4>
+      <p>Drink 500ml water before HIIT. Post-session: coconut water or nimbu pani (no sugar). This session + your Omega-3 supplements = maximum triglyceride and belly fat reduction combo.</p>
+    </div>
+  </div>
+</div><!-- end day 5 -->
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DAY 6 — SUNDAY — RECOVERY -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="day-content" id="day-6">
+  <div class="day-header">
+    <div class="day-badge" style="background:rgba(62,207,142,.08);border-color:rgba(62,207,142,.2);color:var(--green)">Day 7 · Sunday</div>
+    <div class="day-title" style="color:var(--green)">RESET DAY</div>
+    <div class="day-subtitle">Prepare mentally and physically for the week ahead. Sleep early tonight.</div>
+  </div>
+  <div class="rec-wrap">
+    <span class="rec-emoji">☀️</span>
+    <div class="rec-title">SUNDAY RESET</div>
+    <div class="rec-sub">You've worked hard all week. Now let your body absorb the gains. Recovery is not optional — it's productive.</div>
+    <div class="rec-list">
+      <div class="rec-item">
+        <div class="rec-item-icon">🌅</div>
+        <div>
+          <h4>Long Walk — 30–45 min</h4>
+          <p>Morning or evening, comfortable pace. No heart rate pushing. This alone burns visceral fat over time and dramatically improves your insulin sensitivity.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">🧘</div>
+        <div>
+          <h4>Light Yoga or Mobility — 15 min</h4>
+          <p>Child's pose, pigeon pose, cat-cow, downward dog. YouTube "10 min morning yoga" and follow along. Reduces cortisol, improves belly fat hormonal environment.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">🌙</div>
+        <div>
+          <h4>Sleep by 10:30 PM</h4>
+          <p>Sleep is the most underrated fat loss tool. Poor sleep raises ghrelin (hunger hormone) and cortisol — both directly drive belly fat. 7–8 hours tonight.</p>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-item-icon">📊</div>
+        <div>
+          <h4>Weekly Check-in (Every Sunday)</h4>
+          <p>Measure waist (currently 102cm) first thing in the morning, fasted. Note the number. Trend matters more than day-to-day fluctuation. April 30 target: visible reduction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- end day 6 -->
+
+</div><!-- end main -->
+
+<script>
+let currentDay = 0;
+const tabs = document.querySelectorAll('.day-tab');
+const contents = document.querySelectorAll('.day-content');
+
+function switchDay(idx){
+  currentDay = idx;
+  tabs.forEach((t,i) => t.classList.toggle('active', i===idx));
+  contents.forEach((c,i) => c.classList.toggle('active', i===idx));
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleDone(btn){
+  const card = btn.closest('.exercise-card');
+  const isDone = card.classList.toggle('done');
+  btn.textContent = isDone ? '✓ Completed!' : '✓ Mark as Done';
+  updateProgress();
+}
+
+function updateProgress(){
+  const dayCards = document.querySelectorAll(`#day-${currentDay} .exercise-card`);
+  const doneCards = document.querySelectorAll(`#day-${currentDay} .exercise-card.done`);
+  const total = dayCards.length;
+  const done = doneCards.length;
+  document.getElementById('prog-count').textContent = `${done} / ${total} exercises`;
+  document.getElementById('pfill').style.width = total ? `${(done/total)*100}%` : '0%';
+  const labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  document.getElementById('prog-label').textContent = labels[currentDay] + "'s Progress";
+}
+
+// Init
+switchDay(0);
+
+// Highlight today automatically
+const today = new Date().getDay(); // 0=Sun,1=Mon...
+const dayMap = {1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6};
+if(dayMap[today] !== undefined) switchDay(dayMap[today]);
+</script>
+</body>
+</html>
